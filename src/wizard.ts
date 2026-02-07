@@ -82,7 +82,7 @@ async function askChoice(
   }
   console.log("");
 
-  const answer = await ask(rl, `  Votre choix (1-${options.length}) [${defaultIdx + 1}]: `);
+  const answer = await ask(rl, `  Your choice (1-${options.length}) [${defaultIdx + 1}]: `);
   const idx = answer ? parseInt(answer, 10) - 1 : defaultIdx;
   if (idx >= 0 && idx < options.length) {
     return options[idx].key;
@@ -109,7 +109,7 @@ async function askMultiChoice(
 
   const answer = await ask(
     rl,
-    `  Entrez les numéros séparés par des virgules [${defaultNums}]: `,
+    `  Enter numbers separated by commas [${defaultNums}]: `,
   );
 
   if (!answer) {
@@ -150,54 +150,54 @@ export async function runWizard(): Promise<WizardAnswers> {
   try {
     console.log("");
     console.log("  ╔════════════════════════════════════════════════╗");
-    console.log("  ║  📐 DS Coverage — Assistant de configuration  ║");
+    console.log("  ║  📐 DS Coverage — Configuration Wizard        ║");
     console.log("  ╚════════════════════════════════════════════════╝");
     console.log("");
-    console.log("  Ce wizard va configurer les guidelines de votre design system");
-    console.log("  et générer des règles Cursor pour guider votre développement.");
+    console.log("  This wizard will configure your design system guidelines");
+    console.log("  and generate Cursor rules to guide your development.");
     console.log("");
-    console.log("  ─── Stack technique ───────────────────────────────");
+    console.log("  ─── Tech Stack ───────────────────────────────────");
 
     // 1. CSS Methodology
-    const cssMethodology = (await askChoice(rl, "Quelle méthodologie CSS utilisez-vous ?", [
+    const cssMethodology = (await askChoice(rl, "Which CSS methodology do you use?", [
       { key: "tailwind", label: "Tailwind CSS" },
       { key: "css-modules", label: "CSS Modules" },
       { key: "css-in-js", label: "CSS-in-JS (styled-components, Emotion, etc.)" },
-      { key: "vanilla-css", label: "CSS / SCSS / LESS classique" },
-      { key: "utility-custom", label: "Utility-first custom" },
-      { key: "none", label: "Pas encore décidé / Autre" },
+      { key: "vanilla-css", label: "CSS / SCSS / LESS (classic)" },
+      { key: "utility-custom", label: "Custom utility-first" },
+      { key: "none", label: "Not decided yet / Other" },
     ])) as CssMethodology;
 
     // 2. Framework
-    const framework = (await askChoice(rl, "Quel framework frontend ?", [
+    const framework = (await askChoice(rl, "Which frontend framework?", [
       { key: "react", label: "React (JSX / TSX)" },
       { key: "vue", label: "Vue (SFC)" },
       { key: "svelte", label: "Svelte" },
       { key: "vanilla", label: "Vanilla JS / TypeScript" },
-      { key: "other", label: "Autre" },
+      { key: "other", label: "Other" },
     ])) as Framework;
 
     // 3. Design System Status
     const dsStatus = (await askChoice(
       rl,
-      "Quel est l'état de votre design system ?",
+      "What is the current state of your design system?",
       [
-        { key: "existing", label: "J'ai un design system existant à rendre consistant" },
-        { key: "from-scratch", label: "Je pars de zéro — je veux en construire un" },
+        { key: "existing", label: "I have an existing design system to enforce" },
+        { key: "from-scratch", label: "Starting from scratch — I want to build one" },
       ],
     )) as DsStatus;
 
     console.log("");
-    console.log("  ─── Structure du projet ───────────────────────────");
+    console.log("  ─── Project Structure ─────────────────────────────");
 
     // 4. Source directory
-    const scanDir = await askText(rl, "Répertoire source à scanner ?", "src");
+    const scanDir = await askText(rl, "Source directory to scan?", "src");
 
     // 5. Extensions
     const defaultExtensions = getDefaultExtensions(framework);
     const extensionsStr = await askText(
       rl,
-      "Extensions de fichiers (séparées par des virgules) ?",
+      "File extensions (comma-separated)?",
       defaultExtensions.join(", "),
     );
     const extensions = extensionsStr.split(",").map((s) => s.trim()).filter(Boolean);
@@ -205,14 +205,14 @@ export async function runWizard(): Promise<WizardAnswers> {
     // 6. Component directory
     const componentDir = await askText(
       rl,
-      "Répertoire des composants UI réutilisables ?",
+      "Reusable UI components directory?",
       "components/ui",
     );
 
     // 7. Component architecture
     const componentArchitecture = (await askChoice(
       rl,
-      "Quelle architecture pour vos composants ?",
+      "Which architecture for your components?",
       getComponentArchitectureOptions(cssMethodology),
     )) as ComponentArchitecture;
 
@@ -222,20 +222,20 @@ export async function runWizard(): Promise<WizardAnswers> {
     // 8. Token categories
     const tokenCategories = await askMultiChoice(
       rl,
-      "Quelles catégories de tokens voulez-vous appliquer ?",
+      "Which token categories do you want to enforce?",
       getTokenCategoryOptions(cssMethodology),
     );
 
     console.log("");
-    console.log("  ─── Migration (optionnel) ─────────────────────────");
+    console.log("  ─── Migration (optional) ─────────────────────────");
 
     // 9. Migration planning
     const wantsMigration = (await askChoice(
       rl,
-      "Prévoyez-vous une migration de librairie de composants ?",
+      "Are you planning a component library migration?",
       [
-        { key: "no", label: "Non, pas pour le moment" },
-        { key: "yes", label: "Oui, je veux planifier une migration" },
+        { key: "no", label: "No, not at this time" },
+        { key: "yes", label: "Yes, I want to plan a migration" },
       ],
     ));
 
@@ -243,27 +243,27 @@ export async function runWizard(): Promise<WizardAnswers> {
     if (wantsMigration === "yes") {
       migrationTargetDS = await askText(
         rl,
-        "Nom du design system cible (ex: shadcn/ui, Radix, Custom DS v2) ?",
+        "Target design system name (e.g. shadcn/ui, Radix, Custom DS v2)?",
         "shadcn/ui",
       );
     }
 
     console.log("");
-    console.log("  ─── Récapitulatif ─────────────────────────────────");
+    console.log("  ─── Summary ───────────────────────────────────────");
     console.log("");
     console.log(`    CSS:           ${PRESETS_INFO[cssMethodology]?.label || cssMethodology}`);
     console.log(`    Framework:     ${getFrameworkLabel(framework)}`);
-    console.log(`    Design System: ${dsStatus === "existing" ? "Existant" : "Nouveau (from scratch)"}`);
+    console.log(`    Design System: ${dsStatus === "existing" ? "Existing" : "New (from scratch)"}`);
     console.log(`    Source:        ${scanDir}/`);
     console.log(`    Extensions:    ${extensions.join(", ")}`);
-    console.log(`    Composants:    ${componentDir}/`);
+    console.log(`    Components:    ${componentDir}/`);
     console.log(`    Tokens:        ${tokenCategories.join(", ")}`);
     if (migrationTargetDS) console.log(`    Migration →    ${migrationTargetDS}`);
     console.log("");
 
-    const confirm = await ask(rl, "  Confirmer et générer ? (O/n): ");
-    if (confirm.toLowerCase() === "n" || confirm.toLowerCase() === "non") {
-      console.log("\n  Annulé. Relancez `npx ds-coverage init` pour recommencer.\n");
+    const confirm = await ask(rl, "  Confirm and generate? (Y/n): ");
+    if (confirm.toLowerCase() === "n" || confirm.toLowerCase() === "no") {
+      console.log("\n  Cancelled. Re-run `npx ds-coverage init` to start over.\n");
       process.exit(0);
     }
 
@@ -375,15 +375,15 @@ export function buildConfigFromAnswers(answers: WizardAnswers): Partial<DsCovera
 function getDefaultExtensions(framework: Framework): string[] {
   switch (framework) {
     case "react":
-      return [".tsx", ".jsx"];
+      return [".tsx", ".jsx", ".css", ".scss"];
     case "vue":
-      return [".vue", ".ts", ".js"];
+      return [".vue", ".ts", ".js", ".css", ".scss"];
     case "svelte":
-      return [".svelte", ".ts", ".js"];
+      return [".svelte", ".ts", ".js", ".css", ".scss"];
     case "vanilla":
-      return [".ts", ".js", ".html", ".css"];
+      return [".ts", ".js", ".html", ".css", ".scss"];
     default:
-      return [".ts", ".js", ".tsx", ".jsx"];
+      return [".ts", ".js", ".tsx", ".jsx", ".css", ".scss"];
   }
 }
 
@@ -414,16 +414,16 @@ function getComponentArchitectureOptions(
   const options: { key: string; label: string }[] = [];
 
   if (css === "tailwind" || css === "utility-custom") {
-    options.push({ key: "cva", label: "CVA (Class Variance Authority) — recommandé avec utility classes" });
+    options.push({ key: "cva", label: "CVA (Class Variance Authority) — recommended with utility classes" });
   }
   if (css === "css-in-js") {
     options.push({ key: "styled-components", label: "Styled Components / Emotion — variants via props" });
   }
   if (css === "css-modules") {
-    options.push({ key: "css-modules", label: "CSS Modules — variants via classNames conditionnels" });
+    options.push({ key: "css-modules", label: "CSS Modules — variants via conditional classNames" });
   }
-  options.push({ key: "vanilla", label: "CSS classique — BEM ou conventions custom" });
-  options.push({ key: "other", label: "Autre / Je déciderai plus tard" });
+  options.push({ key: "vanilla", label: "Classic CSS — BEM or custom conventions" });
+  options.push({ key: "other", label: "Other / I'll decide later" });
 
   return options;
 }
@@ -432,12 +432,12 @@ function getTokenCategoryOptions(
   css: CssMethodology,
 ): { key: string; label: string; defaultOn: boolean }[] {
   return [
-    { key: "colors", label: "Couleurs", defaultOn: true },
-    { key: "typography", label: "Typographie", defaultOn: true },
-    { key: "spacing", label: "Espacement (margin, padding, gap)", defaultOn: css === "tailwind" },
+    { key: "colors", label: "Colors", defaultOn: true },
+    { key: "typography", label: "Typography", defaultOn: true },
+    { key: "spacing", label: "Spacing (margin, padding, gap)", defaultOn: css === "tailwind" },
     { key: "radius", label: "Border radius", defaultOn: true },
-    { key: "shadows", label: "Ombres", defaultOn: true },
-    { key: "darkMode", label: "Dark mode (enforcement sémantique)", defaultOn: css === "tailwind" },
+    { key: "shadows", label: "Shadows", defaultOn: true },
+    { key: "darkMode", label: "Dark mode (semantic enforcement)", defaultOn: css === "tailwind" },
   ];
 }
 
@@ -447,7 +447,7 @@ function getFrameworkLabel(framework: Framework): string {
     vue: "Vue",
     svelte: "Svelte",
     vanilla: "Vanilla JS/TS",
-    other: "Autre",
+    other: "Other",
   };
   return labels[framework];
 }
@@ -458,7 +458,7 @@ function getFrameworkLabel(framework: Framework): string {
 
 export function serializeConfig(config: Partial<DsCoverageConfig>): string {
   return `/**
- * ds-coverage.config.js
+ * ds-coverage.config.mjs
  *
  * Auto-generated by \`npx ds-coverage init\`.
  * Customize the patterns, categories, and rules to match your design system.

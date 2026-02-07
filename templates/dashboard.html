@@ -471,9 +471,9 @@ function renderRoadmap() {
 
 function renderMigration() {
   const mig = report.migration;
-  if (!mig) return '<div class="empty-state"><div class="icon">🔄</div><h2 class="ts-xl-sb">Pas de plan de migration</h2><p class="ts-d-r" style="margin-top:var(--space-8)">Configurez la section <code>migration</code> dans votre ds-coverage.config.js</p></div>';
+  if (!mig) return '<div class="empty-state"><div class="icon">🔄</div><h2 class="ts-xl-sb">No migration plan</h2><p class="ts-d-r" style="margin-top:var(--space-8)">Configure the <code>migration</code> section in your ds-coverage config</p></div>';
   const ms = mig.summary;
-  if (ms.totalMappings === 0) return '<div class="empty-state"><div class="icon">✅</div><h2 class="ts-xl-sb">Aucun composant à migrer</h2></div>';
+  if (ms.totalMappings === 0) return '<div class="empty-state"><div class="icon">✅</div><h2 class="ts-xl-sb">No components to migrate</h2></div>';
 
   // Filter components
   let components = mig.components;
@@ -484,34 +484,34 @@ function renderMigration() {
   const groups = { simple: [], moderate: [], complex: [] };
   for (const c of components) groups[c.complexity].push(c);
 
-  const complexityLabels = { simple: '✅ Simple', moderate: '⚠️ Modéré', complex: '🔴 Complexe' };
+  const complexityLabels = { simple: '✅ Simple', moderate: '⚠️ Moderate', complex: '🔴 Complex' };
   const complexityDescs = {
-    simple: 'Swap direct — API compatible ou quasi-compatible. Changement d\'import + renommage minimal.',
-    moderate: 'Adaptation requise — props à mapper, quelques ajustements de logique.',
-    complex: 'Refactoring significatif — API différente, logique métier à adapter, tests à réécrire.'
+    simple: 'Direct swap — compatible or near-compatible API. Import change + minimal renaming.',
+    moderate: 'Adaptation required — props to map, some logic adjustments needed.',
+    complex: 'Significant refactoring — different API, business logic to adapt, tests to rewrite.'
   };
 
   // Hero stats
   const heroHtml = `<div class="hero" style="grid-template-columns: 1fr">
     <div class="hero-stats" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr))">
-      <div class="stat"><div class="stat-value">${ms.totalMappings}</div><div class="stat-label ts-xxs-m">Composants à migrer</div></div>
-      <div class="stat"><div class="stat-value">${ms.totalUsages}</div><div class="stat-label ts-xxs-m">Usages détectés</div></div>
-      <div class="stat"><div class="stat-value">${ms.totalFilesAffected}</div><div class="stat-label ts-xxs-m">Fichiers impactés</div></div>
+      <div class="stat"><div class="stat-value">${ms.totalMappings}</div><div class="stat-label ts-xxs-m">Components to migrate</div></div>
+      <div class="stat"><div class="stat-value">${ms.totalUsages}</div><div class="stat-label ts-xxs-m">Usages detected</div></div>
+      <div class="stat"><div class="stat-value">${ms.totalFilesAffected}</div><div class="stat-label ts-xxs-m">Files affected</div></div>
       <div class="stat" style="cursor:pointer;${migComplexityFilter==='simple'?'box-shadow:0 0 0 2px var(--color-success);':''}" onclick="setMigFilter('simple')"><div class="stat-value" style="color:var(--color-success)">${ms.byComplexity.simple.count}</div><div class="stat-label ts-xxs-m">Simple</div></div>
-      <div class="stat" style="cursor:pointer;${migComplexityFilter==='moderate'?'box-shadow:0 0 0 2px var(--color-warning);':''}" onclick="setMigFilter('moderate')"><div class="stat-value" style="color:var(--color-warning)">${ms.byComplexity.moderate.count}</div><div class="stat-label ts-xxs-m">Modéré</div></div>
-      <div class="stat" style="cursor:pointer;${migComplexityFilter==='complex'?'box-shadow:0 0 0 2px var(--color-danger);':''}" onclick="setMigFilter('complex')"><div class="stat-value" style="color:var(--color-danger)">${ms.byComplexity.complex.count}</div><div class="stat-label ts-xxs-m">Complexe</div></div>
+      <div class="stat" style="cursor:pointer;${migComplexityFilter==='moderate'?'box-shadow:0 0 0 2px var(--color-warning);':''}" onclick="setMigFilter('moderate')"><div class="stat-value" style="color:var(--color-warning)">${ms.byComplexity.moderate.count}</div><div class="stat-label ts-xxs-m">Moderate</div></div>
+      <div class="stat" style="cursor:pointer;${migComplexityFilter==='complex'?'box-shadow:0 0 0 2px var(--color-danger);':''}" onclick="setMigFilter('complex')"><div class="stat-value" style="color:var(--color-danger)">${ms.byComplexity.complex.count}</div><div class="stat-label ts-xxs-m">Complex</div></div>
     </div>
   </div>`;
 
   // Toolbar
   const toolbarHtml = `<div class="toolbar">
     <div class="mig-complexity-filter">
-      <button class="api-loc-btn ts-xs-m ${migComplexityFilter==='all'?'active':''}" onclick="setMigFilter('all')">Tous (${ms.totalMappings})</button>
+      <button class="api-loc-btn ts-xs-m ${migComplexityFilter==='all'?'active':''}" onclick="setMigFilter('all')">All (${ms.totalMappings})</button>
       <button class="api-loc-btn ts-xs-m ${migComplexityFilter==='simple'?'active':''}" onclick="setMigFilter('simple')">✅ Simple (${ms.byComplexity.simple.count})</button>
-      <button class="api-loc-btn ts-xs-m ${migComplexityFilter==='moderate'?'active':''}" onclick="setMigFilter('moderate')">⚠️ Modéré (${ms.byComplexity.moderate.count})</button>
-      <button class="api-loc-btn ts-xs-m ${migComplexityFilter==='complex'?'active':''}" onclick="setMigFilter('complex')">🔴 Complexe (${ms.byComplexity.complex.count})</button>
+      <button class="api-loc-btn ts-xs-m ${migComplexityFilter==='moderate'?'active':''}" onclick="setMigFilter('moderate')">⚠️ Moderate (${ms.byComplexity.moderate.count})</button>
+      <button class="api-loc-btn ts-xs-m ${migComplexityFilter==='complex'?'active':''}" onclick="setMigFilter('complex')">🔴 Complex (${ms.byComplexity.complex.count})</button>
     </div>
-    <input class="search-input ts-xs-r" type="text" placeholder="Rechercher un composant..." value="${migSearchQuery}" oninput="onMigSearch(this.value)" style="max-width:280px" />
+    <input class="search-input ts-xs-r" type="text" placeholder="Search a component..." value="${migSearchQuery}" oninput="onMigSearch(this.value)" style="max-width:280px" />
   </div>`;
 
   // Render component cards grouped by complexity
@@ -525,18 +525,18 @@ function renderMigration() {
     sectionsHtml += `<div class="mig-section">
       <div class="mig-section-header">
         <span class="mig-section-badge ${level} ts-xs-m">${complexityLabels[level]}</span>
-        <span class="ts-xs-r" style="color:var(--text-secondary)">${groupComps.length} composant${groupComps.length > 1 ? 's' : ''} — ${complexityDescs[level]}</span>
+        <span class="ts-xs-r" style="color:var(--text-secondary)">${groupComps.length} component${groupComps.length > 1 ? 's' : ''} — ${complexityDescs[level]}</span>
       </div>
       ${groupComps.map(c => renderMigCard(c)).join('')}
     </div>`;
   }
 
   if (components.length === 0) {
-    sectionsHtml = '<div class="empty-state ts-d-r">Aucun composant ne correspond au filtre.</div>';
+    sectionsHtml = '<div class="empty-state ts-d-r">No components match the current filter.</div>';
   }
 
   return `<h2 class="ts-xl-sb" style="margin-bottom:var(--space-8)">Migration Plan → ${esc(mig.targetDS)}</h2>
-    <p class="ts-d-r" style="color:var(--text-secondary);margin-bottom:var(--space-24)">Plan de migration composant par composant. Chaque carte inclut les guidelines, le mapping de props, et les fichiers impactés.</p>
+    <p class="ts-d-r" style="color:var(--text-secondary);margin-bottom:var(--space-24)">Component-by-component migration plan. Each card includes guidelines, prop mapping, and affected files.</p>
     ${heroHtml}${toolbarHtml}${sectionsHtml}`;
 }
 
@@ -546,7 +546,7 @@ function renderMigCard(c) {
   let guidelinesHtml = '';
   if (c.guidelines) {
     guidelinesHtml = `<div class="mig-guidelines">
-      <div class="mig-guidelines-title ts-xxs-m">📋 Guidelines de migration</div>
+      <div class="mig-guidelines-title ts-xxs-m">📋 Migration Guidelines</div>
       <div class="mig-guidelines-content ts-xs-r">${esc(c.guidelines)}</div>
     </div>`;
   }
@@ -554,7 +554,7 @@ function renderMigCard(c) {
   let propsHtml = '';
   if (c.propMapping) {
     propsHtml = `<div class="mig-props">
-      <div class="ts-xxs-m" style="color:var(--text-secondary);margin-bottom:var(--space-4)">🔀 Mapping de props</div>
+      <div class="ts-xxs-m" style="color:var(--text-secondary);margin-bottom:var(--space-4)">🔀 Prop Mapping</div>
       <div class="ts-xs-r" style="font-family:var(--font-family-mono)">${esc(c.propMapping)}</div>
     </div>`;
   }
@@ -569,7 +569,7 @@ function renderMigCard(c) {
 
   const filesHtml = c.files.length > 0 ? `<div style="border-top:1px solid var(--border-default);padding-top:var(--space-12)">
     <button class="mig-files-toggle ts-xs-m" onclick="event.stopPropagation();toggleMigFiles('${c.source.replace(/'/g,"\\'")}')">
-      ${isOpen ? '▾ Masquer les fichiers' : '▸ Voir les fichiers'} (${c.filesAffected})
+      ${isOpen ? '▾ Hide files' : '▸ Show files'} (${c.filesAffected})
     </button>
     <div class="mig-file-list ${isOpen ? 'open' : ''}">
       ${c.files.map(f => `<div class="mig-file-item">
@@ -593,7 +593,7 @@ function renderMigCard(c) {
     </div>
     <div class="mig-meta">
       <div class="mig-meta-item ts-xxs-r"><span class="mig-meta-value">${c.totalUsages}</span> usages</div>
-      <div class="mig-meta-item ts-xxs-r"><span class="mig-meta-value">${c.filesAffected}</span> fichiers</div>
+      <div class="mig-meta-item ts-xxs-r"><span class="mig-meta-value">${c.filesAffected}</span> files</div>
       <div class="mig-meta-item ts-xxs-r" style="font-family:var(--font-family-mono)">→ ${esc(c.targetImportPath)}</div>
     </div>
     ${guidelinesHtml}${propsHtml}${breakingHtml}${filesHtml}

@@ -32,6 +32,12 @@ interface DetectedUsage {
  * 1. Import statements matching the source pattern
  * 2. JSX/template usage: <ComponentName ... /> or <ComponentName>
  */
+/**
+ * Special import pattern that indicates native HTML elements.
+ * When used, skip import detection and just count JSX usage.
+ */
+const HTML_NATIVE_PATTERN = "html-native";
+
 function detectComponentUsage(
   content: string,
   componentName: string,
@@ -41,25 +47,30 @@ function detectComponentUsage(
   const importLines: number[] = [];
   const usageLines: number[] = [];
 
-  // Build import regex from pattern
-  // The importPattern can be a module path like "@company/ui" or a regex string
-  const importRegex = new RegExp(
-    `(?:import|from)\\s+.*['"]\\.?/?${escapeRegex(importPattern)}['"]` +
-    `|` +
-    `(?:import|from)\\s+.*['"]${escapeRegex(importPattern)}['"]` +
-    `|` +
-    `require\\s*\\(\\s*['"]${escapeRegex(importPattern)}['"]`,
-    "i",
-  );
+  const isNativeHtml = importPattern === HTML_NATIVE_PATTERN;
 
-  // Also detect named imports of the component specifically
-  const namedImportRegex = new RegExp(
-    `\\b${escapeRegex(componentName)}\\b.*from\\s+['"]` +
-    `|` +
-    `import\\s+${escapeRegex(componentName)}\\b` +
-    `|` +
-    `import\\s*\\{[^}]*\\b${escapeRegex(componentName)}\\b[^}]*\\}`,
-  );
+  // For native HTML elements, skip import detection entirely
+  if (!isNativeHtml) {
+    // Build import regex from pattern
+    // The importPattern can be a module path like "@company/ui" or a regex string
+    var importRegex = new RegExp(
+      `(?:import|from)\\s+.*['"]\\.?/?${escapeRegex(importPattern)}['"]` +
+      `|` +
+      `(?:import|from)\\s+.*['"]${escapeRegex(importPattern)}['"]` +
+      `|` +
+      `require\\s*\\(\\s*['"]${escapeRegex(importPattern)}['"]`,
+      "i",
+    );
+
+    // Also detect named imports of the component specifically
+    var namedImportRegex = new RegExp(
+      `\\b${escapeRegex(componentName)}\\b.*from\\s+['"]` +
+      `|` +
+      `import\\s+${escapeRegex(componentName)}\\b` +
+      `|` +
+      `import\\s*\\{[^}]*\\b${escapeRegex(componentName)}\\b[^}]*\\}`,
+    );
+  }
 
   // JSX usage: <ComponentName or </ComponentName
   const jsxRegex = new RegExp(`</?${escapeRegex(componentName)}[\\s/>]`, "g");
@@ -70,7 +81,7 @@ function detectComponentUsage(
     ? new RegExp(`</?${escapeRegex(kebabName)}[\\s/>]`, "g")
     : null;
 
-  let hasImport = false;
+  let hasImport = isNativeHtml; // Native HTML is always "imported" (global)
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
@@ -81,14 +92,16 @@ function detectComponentUsage(
       continue;
     }
 
-    // Check for imports
-    if (importRegex.test(line) || namedImportRegex.test(line)) {
-      importLines.push(i + 1);
-      hasImport = true;
-      continue;
+    // Check for imports (skip for native HTML)
+    if (!isNativeHtml && importRegex! && namedImportRegex!) {
+      if (importRegex.test(line) || namedImportRegex.test(line)) {
+        importLines.push(i + 1);
+        hasImport = true;
+        continue;
+      }
     }
 
-    // Check for JSX/template usage (only if we found an import or this is a component-level scan)
+    // Check for JSX/template usage
     jsxRegex.lastIndex = 0;
     if (jsxRegex.test(line)) {
       usageLines.push(i + 1);

@@ -23,17 +23,19 @@
     "LICENSE",
     "README.md"
   ],
-  "main": "./dist/index.js",
+  "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     },
     "./config": {
       "types": "./dist/config.d.ts",
-      "import": "./dist/config.js"
+      "import": "./dist/config.js",
+      "require": "./dist/config.cjs"
     }
   },
   "bin": {

@@ -4,6 +4,7 @@
  * Usage:
  *   npx ds-coverage              # Scan and generate dashboard
  *   npx ds-coverage init         # Interactive wizard + scaffold AI guidelines
+ *   npx ds-coverage doctor       # Validate config and diagnose issues
  *   npx ds-coverage --dry-run    # Scan without writing files
  *   npx ds-coverage --silent     # No console output
  *   npx ds-coverage --open       # Open dashboard in browser after scan
@@ -11,6 +12,7 @@
  */
 
 import { run, init } from "../src/index.js";
+import { doctor } from "../src/doctor.js";
 
 const args = process.argv.slice(2);
 const command = args[0] && !args[0].startsWith("-") ? args[0] : "scan";
@@ -31,11 +33,13 @@ if (args.includes("--help") || args.includes("-h")) {
     scan (default)   Scan codebase and generate dashboard
     init             Interactive setup wizard + scaffold AI guidelines
                      (Cursor rules & skills, Claude/Agents skills)
+    doctor           Validate config and diagnose common issues
 
   Scan options:
     --dry-run        Scan without writing report/dashboard files
     --silent         No console output
     --open           Open dashboard in browser after scan
+    --config <path>  Path to config file (default: auto-discover)
     --dir <path>     Project root directory (default: cwd)
 
   Init options:
@@ -44,15 +48,21 @@ if (args.includes("--help") || args.includes("-h")) {
     --no-interactive     Skip wizard (use existing config or defaults)
     --target <name>      Only generate for specific target (cursor, claude, agents)
                          Can be repeated: --target cursor --target claude
+    --config <path>      Path to config file
     --dir <path>         Project root directory (default: cwd)
 
+  Doctor options:
+    --config <path>  Path to config file (default: auto-discover)
+    --dir <path>     Project root directory (default: cwd)
+
   General:
+    -v, --version    Show version
     -h, --help       Show this help message
 
   Configuration:
     Run \`npx ds-coverage init\` to launch the interactive setup wizard.
     It will guide you through configuration and generate:
-    - ds-coverage.config.js (your config file)
+    - ds-coverage.config.mjs (your config file)
     - .cursor/rules/ (AI rules for Cursor)
     - .cursor/skills/ (AI skills for Cursor)
 
@@ -70,6 +80,12 @@ let projectRoot = process.cwd();
 const dirIdx = args.indexOf("--dir");
 if (dirIdx !== -1 && args[dirIdx + 1]) {
   projectRoot = args[dirIdx + 1];
+}
+
+let configPath: string | undefined;
+const configIdx = args.indexOf("--config");
+if (configIdx !== -1 && args[configIdx + 1]) {
+  configPath = args[configIdx + 1];
 }
 
 async function main() {
@@ -98,12 +114,15 @@ async function main() {
         silent,
         force,
         noInteractive,
+        configPath,
         targets: targets.length > 0 ? targets : undefined,
       });
+    } else if (command === "doctor") {
+      await doctor({ projectRoot, configPath });
     } else {
       // Default: scan
       const open = args.includes("--open");
-      const { dashboardPath } = await run({ projectRoot, dryRun, silent });
+      const { dashboardPath } = await run({ projectRoot, dryRun, silent, configPath });
 
       if (open && !dryRun) {
         const { exec } = await import("node:child_process");
@@ -123,7 +142,7 @@ async function main() {
 
     // Helpful hints based on common errors
     if (message.includes("does not exist")) {
-      console.error("   💡 Check that your scanDir is correct in ds-coverage.config.js");
+      console.error("   💡 Check that your scanDir is correct in your ds-coverage config");
       console.error("   💡 Or run `npx ds-coverage init` to create a config.\n");
     } else if (message.includes("config")) {
       console.error("   💡 Run `npx ds-coverage init` to create or fix your config.\n");

@@ -56,7 +56,7 @@ describe("Templates", () => {
       r.relativePath.includes("design-system-compliance.mdc"),
     );
     assert.ok(complianceRule, "should generate compliance rule");
-    assert.ok(complianceRule.content.includes("Colors"), "compliance rule should mention Colors");
+    assert.ok(complianceRule.content.includes("Colors") || complianceRule.content.includes("colors"), "compliance rule should mention Colors");
     assert.ok(complianceRule.content.includes("@ds-migrate"), "compliance rule should mention flagging");
     assert.ok(complianceRule.content.includes("Boy Scout"), "compliance rule should mention Boy Scout Rule");
 

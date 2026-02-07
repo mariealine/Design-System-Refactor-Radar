@@ -21,6 +21,8 @@ export type { Report } from "./types.js";
 export { DEFAULT_CONFIG } from "./config.js";
 export { init } from "./init.js";
 export type { InitOptions } from "./init.js";
+export { doctor } from "./doctor.js";
+export type { DoctorOptions } from "./doctor.js";
 export { runWizard, buildConfigFromAnswers, serializeConfig } from "./wizard.js";
 export type { WizardAnswers } from "./wizard.js";
 
@@ -29,6 +31,8 @@ export interface RunOptions {
   projectRoot?: string;
   /** Override config (merged with file config + defaults) */
   config?: Partial<DsCoverageConfig>;
+  /** Path to config file (overrides auto-discovery) */
+  configPath?: string;
   /** Skip writing files to disk */
   dryRun?: boolean;
   /** Silent mode — no console output */
@@ -49,7 +53,7 @@ export async function run(options: RunOptions = {}): Promise<RunResult> {
   const projectRoot = options.projectRoot || process.cwd();
 
   // Load and merge config (deep merge to preserve nested defaults)
-  let config = await loadConfig(projectRoot);
+  let config = await loadConfig(projectRoot, options.configPath);
   if (options.config) {
     config = deepMerge(config, options.config);
   }
@@ -60,15 +64,15 @@ export async function run(options: RunOptions = {}): Promise<RunResult> {
   // Check if config has violations defined
   const enabledViolations = Object.entries(config.violations).filter(([, v]) => v.enabled);
   if (enabledViolations.length === 0) {
-    log("⚠️  Aucune catégorie de violation configurée.");
-    log("   Lancez `npx ds-coverage init` pour configurer votre projet.\n");
+    log("⚠️  No violation categories configured.");
+    log("   Run `npx ds-coverage init` to set up your project.\n");
   }
 
-  log("🔍 Scan de la couverture design system...\n");
+  log("🔍 Scanning design system coverage...\n");
 
   // 1. Scan files
   const { fileReports, fileContents, totalFiles } = await scan(projectRoot, config);
-  log(`  ${totalFiles} fichiers trouvés, ${fileReports.length} scannés (après exclusions)\n`);
+  log(`  ${totalFiles} files found, ${fileReports.length} scanned (after exclusions)\n`);
 
   // 2. Analyze component APIs
   const componentApi = analyzeComponents(fileReports, fileContents, scanDir, config);
@@ -133,17 +137,17 @@ export async function run(options: RunOptions = {}): Promise<RunResult> {
   }
 
   // 7. Print summary
-  log("📊 Rapport de couverture Design System");
+  log("📊 Design System Coverage Report");
   log("======================================\n");
-  log(`  Couverture:       ${coveragePercent}% (${fileReports.length - filesWithViolations.length}/${fileReports.length} fichiers conformes)`);
+  log(`  Coverage:         ${coveragePercent}% (${fileReports.length - filesWithViolations.length}/${fileReports.length} compliant files)`);
   log(`  Total violations: ${totalViolations}`);
-  log(`  Fichiers touchés: ${filesWithViolations.length}\n`);
+  log(`  Files affected:   ${filesWithViolations.length}\n`);
 
   if (Object.keys(categories).length > 0) {
-    log("  Par catégorie:");
+    log("  By category:");
     for (const [key, cat] of Object.entries(categories)) {
       const label = config.violations[key]?.label || key;
-      log(`    ${label.padEnd(14)} ${cat.totalViolations} violations dans ${cat.totalFiles} fichiers`);
+      log(`    ${label.padEnd(14)} ${cat.totalViolations} violations in ${cat.totalFiles} files`);
     }
     log("");
   }
@@ -156,27 +160,27 @@ export async function run(options: RunOptions = {}): Promise<RunResult> {
   if (config.componentAnalysis.enabled) {
     const ca = componentApi.summary;
     log("");
-    log("  Composants API:");
+    log("  Component API:");
     log(`    Total:          ${ca.totalComponents} (${Object.entries(ca.byLocation).map(([k, v]) => `${v} ${k}/`).join(", ")})`);
-    if (ca.usesCVA > 0) log(`    Utilise CVA:    ${ca.usesCVA}`);
-    log(`    API correcte:   ${ca.correctApiNaming}`);
-    log(`    Conformité moy: ${ca.avgComplianceScore}%`);
+    if (ca.usesCVA > 0) log(`    Uses CVA:       ${ca.usesCVA}`);
+    log(`    Correct API:    ${ca.correctApiNaming}`);
+    log(`    Avg compliance: ${ca.avgComplianceScore}%`);
   }
 
   if (migration && migration.summary.totalMappings > 0) {
     const ms = migration.summary;
     log("");
     log(`  Migration → ${migration.targetDS}:`);
-    log(`    Composants à migrer: ${ms.totalMappings}`);
-    log(`    Usages détectés:     ${ms.totalUsages} dans ${ms.totalFilesAffected} fichiers`);
-    if (ms.byComplexity.simple.count > 0) log(`    ✅ Simple:   ${ms.byComplexity.simple.count} composants (${ms.byComplexity.simple.usages} usages)`);
-    if (ms.byComplexity.moderate.count > 0) log(`    ⚠️  Modéré:   ${ms.byComplexity.moderate.count} composants (${ms.byComplexity.moderate.usages} usages)`);
-    if (ms.byComplexity.complex.count > 0) log(`    🔴 Complexe: ${ms.byComplexity.complex.count} composants (${ms.byComplexity.complex.usages} usages)`);
+    log(`    Components to migrate: ${ms.totalMappings}`);
+    log(`    Usages detected:       ${ms.totalUsages} in ${ms.totalFilesAffected} files`);
+    if (ms.byComplexity.simple.count > 0) log(`    ✅ Simple:   ${ms.byComplexity.simple.count} components (${ms.byComplexity.simple.usages} usages)`);
+    if (ms.byComplexity.moderate.count > 0) log(`    ⚠️  Moderate: ${ms.byComplexity.moderate.count} components (${ms.byComplexity.moderate.usages} usages)`);
+    if (ms.byComplexity.complex.count > 0) log(`    🔴 Complex:  ${ms.byComplexity.complex.count} components (${ms.byComplexity.complex.usages} usages)`);
   }
 
   if (!options.dryRun) {
-    log(`\n  Rapport:    ${relative(projectRoot, reportJsonPath)}`);
-    log(`  Dashboard:  ${relative(projectRoot, dashboardPath)}\n`);
+    log(`\n  Report:    ${relative(projectRoot, reportJsonPath)}`);
+    log(`  Dashboard: ${relative(projectRoot, dashboardPath)}\n`);
   }
 
   return { report, dashboardHtml, reportJsonPath, dashboardPath };

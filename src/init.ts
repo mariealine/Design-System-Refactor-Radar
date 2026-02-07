@@ -32,6 +32,8 @@ export interface InitOptions {
   force?: boolean;
   /** Skip interactive wizard (use existing config or defaults) */
   noInteractive?: boolean;
+  /** Path to config file (overrides auto-discovery) */
+  configPath?: string;
 }
 
 interface GeneratedFile {
@@ -78,27 +80,27 @@ export async function init(options: InitOptions = {}): Promise<GeneratedFile[]> 
 
     // Write config file
     const configContent = serializeConfig(wizardConfig);
-    const configPath = join(projectRoot, "ds-coverage.config.js");
+    const configPath = join(projectRoot, "ds-coverage.config.mjs");
 
     if (!options.dryRun) {
       await writeFile(configPath, configContent, "utf-8");
-      log("\n  ✅ ds-coverage.config.js");
+      log("\n  ✅ ds-coverage.config.mjs");
     } else {
-      log("\n  📝 ds-coverage.config.js (dry run)");
+      log("\n  📝 ds-coverage.config.mjs (dry run)");
     }
 
     // Load full config (merge wizard output with defaults)
-    config = await loadConfig(projectRoot);
+    config = await loadConfig(projectRoot, options.configPath);
     if (options.config) {
       config = deepMerge(config, options.config);
     }
   } else {
     // Load existing config
-    config = await loadConfig(projectRoot);
+    config = await loadConfig(projectRoot, options.configPath);
     if (options.config) {
       config = deepMerge(config, options.config);
     }
-    log("\n📐 Génération des guidelines AI pour votre design system...\n");
+    log("\n📐 Generating AI guidelines for your design system...\n");
   }
 
   // Generate content
@@ -178,7 +180,7 @@ export async function init(options: InitOptions = {}): Promise<GeneratedFile[]> 
         skipped: true,
         reason: "File already exists. Use --force to overwrite.",
       });
-      log(`  ⏭  ${file.relativePath} (ignoré — existe déjà)`);
+      log(`  ⏭  ${file.relativePath} (skipped — already exists)`);
       continue;
     }
 
@@ -189,7 +191,7 @@ export async function init(options: InitOptions = {}): Promise<GeneratedFile[]> 
         content: file.content,
         skipped: false,
       });
-      log(`  📝 ${file.relativePath} (dry run — serait créé)`);
+      log(`  📝 ${file.relativePath} (dry run — would be created)`);
       continue;
     }
 
@@ -212,10 +214,10 @@ export async function init(options: InitOptions = {}): Promise<GeneratedFile[]> 
 
   log("");
   if (created.length > 0) {
-    log(`  ${options.dryRun ? "Serai(en)t créé(s)" : "Créé(s)"}: ${created.length} fichier(s)`);
+    log(`  ${options.dryRun ? "Would create" : "Created"}: ${created.length} file(s)`);
   }
   if (skipped.length > 0) {
-    log(`  Ignoré(s): ${skipped.length} fichier(s) (utilisez --force pour écraser)`);
+    log(`  Skipped: ${skipped.length} file(s) (use --force to overwrite)`);
   }
   log("");
 
@@ -225,14 +227,14 @@ export async function init(options: InitOptions = {}): Promise<GeneratedFile[]> 
   }
 
   if (!options.dryRun && created.length > 0) {
-    log("  ─── Et maintenant ? ──────────────────────────────────");
+    log("  ─── What's next? ──────────────────────────────────");
     log("");
-    log("  💡 Votre assistant Cursor suit maintenant votre design system !");
+    log("  💡 Your Cursor assistant now follows your design system!");
     log("");
-    log("  • Éditez ds-coverage.config.js pour ajuster les règles");
-    log("  • Relancez `npx ds-coverage init --force` après modification");
-    log("  • Lancez `npx ds-coverage` pour scanner votre codebase");
-    log("  • Lancez `npx ds-coverage --open` pour ouvrir le dashboard");
+    log("  • Edit ds-coverage.config.js to adjust rules");
+    log("  • Re-run `npx ds-coverage init --force` after changes");
+    log("  • Run `npx ds-coverage` to scan your codebase");
+    log("  • Run `npx ds-coverage --open` to open the dashboard");
     log("");
   }
 
@@ -270,5 +272,5 @@ async function updateGitignore(
 
   const block = `\n# ds-coverage (generated output)\n${linesToAdd.join("\n")}\n`;
   await writeFile(gitignorePath, existing.trimEnd() + "\n" + block, "utf-8");
-  log(`  ✅ .gitignore (ajouté: ${linesToAdd.join(", ")})`);
+  log(`  ✅ .gitignore (added: ${linesToAdd.join(", ")})`);
 }

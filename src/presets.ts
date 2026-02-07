@@ -61,8 +61,8 @@ export const PRESETS_INFO: Record<PresetId, PresetInfo> = {
     description: "Custom utility classes similar to Tailwind",
   },
   none: {
-    label: "Aucun / Autre",
-    description: "Configuration manuelle des patterns",
+    label: "None / Other",
+    description: "Manual pattern configuration",
   },
 };
 
@@ -86,14 +86,14 @@ const tailwindPreset: Preset = {
   violations: {
     colors: {
       enabled: true,
-      label: "Couleurs",
+      label: "Colors",
       icon: "🎨",
       color: "oklch(0.637 0.237 25.331)",
       pattern: TAILWIND_COLOR_PATTERN,
     },
     typography: {
       enabled: true,
-      label: "Typographie",
+      label: "Typography",
       icon: "🔤",
       color: "oklch(0.723 0.22 70.08)",
       pattern:
@@ -102,22 +102,22 @@ const tailwindPreset: Preset = {
     },
     spacing: {
       enabled: true,
-      label: "Espacement",
+      label: "Spacing",
       icon: "📏",
       color: "oklch(0.623 0.214 259.815)",
       pattern:
-        "\\b(?:p|px|py|pt|pr|pb|pl|m|mx|my|mt|mr|mb|ml|gap|gap-x|gap-y|space-x|space-y)-\\d+\\b",
+        "\\b(?:p|px|py|pt|pr|pb|pl|m|mx|my|mt|mr|mb|ml|gap|gap-x|gap-y|space-x|space-y|w|h|min-w|min-h|max-w|max-h)-\\[\\d+[a-z%]*\\]",
     },
     radius: {
       enabled: true,
       label: "Radius",
       icon: "⬜",
       color: "oklch(0.8 0.25 102.212)",
-      pattern: "\\brounded-(?:sm|md|lg|xl|2xl|3xl|none)\\b",
+      pattern: "\\brounded-\\[\\d+[a-z%]*\\]",
     },
     shadows: {
       enabled: true,
-      label: "Ombres",
+      label: "Shadows",
       icon: "🌫️",
       color: "oklch(0.723 0.219 149.579)",
       pattern: "\\bshadow-(?:sm|md|lg|xl|2xl|inner)\\b",
@@ -146,14 +146,14 @@ const cssModulesPreset: Preset = {
   violations: {
     colors: {
       enabled: true,
-      label: "Couleurs",
+      label: "Colors",
       icon: "🎨",
       color: "oklch(0.637 0.237 25.331)",
       pattern: "#[0-9a-fA-F]{3,8}\\b|\\brgba?\\s*\\(|\\bhsla?\\s*\\(",
     },
     typography: {
       enabled: true,
-      label: "Typographie",
+      label: "Typography",
       icon: "🔤",
       color: "oklch(0.723 0.22 70.08)",
       pattern: "font-size\\s*:\\s*\\d+px|font-weight\\s*:\\s*\\d{3}",
@@ -161,7 +161,7 @@ const cssModulesPreset: Preset = {
     },
     spacing: {
       enabled: true,
-      label: "Espacement",
+      label: "Spacing",
       icon: "📏",
       color: "oklch(0.623 0.214 259.815)",
       pattern: "(?:margin|padding|gap)\\s*:\\s*\\d+px",
@@ -175,7 +175,7 @@ const cssModulesPreset: Preset = {
     },
     shadows: {
       enabled: true,
-      label: "Ombres",
+      label: "Shadows",
       icon: "🌫️",
       color: "oklch(0.723 0.219 149.579)",
       pattern: "box-shadow\\s*:",
@@ -204,14 +204,14 @@ const cssInJsPreset: Preset = {
   violations: {
     colors: {
       enabled: true,
-      label: "Couleurs",
+      label: "Colors",
       icon: "🎨",
       color: "oklch(0.637 0.237 25.331)",
       pattern: "['\"]#[0-9a-fA-F]{3,8}['\"]|color:\\s*['\"]#|background(?:Color)?:\\s*['\"]#",
     },
     typography: {
       enabled: true,
-      label: "Typographie",
+      label: "Typography",
       icon: "🔤",
       color: "oklch(0.723 0.22 70.08)",
       pattern: "fontSize\\s*:\\s*['\"]?\\d+|fontWeight\\s*:\\s*['\"]?\\d{3}",
@@ -219,7 +219,7 @@ const cssInJsPreset: Preset = {
     },
     spacing: {
       enabled: true,
-      label: "Espacement",
+      label: "Spacing",
       icon: "📏",
       color: "oklch(0.623 0.214 259.815)",
       pattern: "(?:margin|padding|gap)\\s*:\\s*['\"]?\\d+",
@@ -233,7 +233,7 @@ const cssInJsPreset: Preset = {
     },
     shadows: {
       enabled: true,
-      label: "Ombres",
+      label: "Shadows",
       icon: "🌫️",
       color: "oklch(0.723 0.219 149.579)",
       pattern: "boxShadow\\s*:",
@@ -262,14 +262,14 @@ const vanillaCssPreset: Preset = {
   violations: {
     colors: {
       enabled: true,
-      label: "Couleurs",
+      label: "Colors",
       icon: "🎨",
       color: "oklch(0.637 0.237 25.331)",
       pattern: "#[0-9a-fA-F]{3,8}\\b|\\brgba?\\s*\\(|\\bhsla?\\s*\\(",
     },
     typography: {
       enabled: true,
-      label: "Typographie",
+      label: "Typography",
       icon: "🔤",
       color: "oklch(0.723 0.22 70.08)",
       pattern: "font-size\\s*:\\s*\\d+px|font-weight\\s*:\\s*\\d{3}",
@@ -277,7 +277,7 @@ const vanillaCssPreset: Preset = {
     },
     spacing: {
       enabled: true,
-      label: "Espacement",
+      label: "Spacing",
       icon: "📏",
       color: "oklch(0.623 0.214 259.815)",
       pattern: "(?:margin|padding|gap)\\s*:\\s*\\d+px",
@@ -291,7 +291,7 @@ const vanillaCssPreset: Preset = {
     },
     shadows: {
       enabled: true,
-      label: "Ombres",
+      label: "Shadows",
       icon: "🌫️",
       color: "oklch(0.723 0.219 149.579)",
       pattern: "box-shadow\\s*:",
@@ -320,14 +320,14 @@ const emptyPreset: Preset = {
   violations: {
     colors: {
       enabled: true,
-      label: "Couleurs",
+      label: "Colors",
       icon: "🎨",
       color: "oklch(0.637 0.237 25.331)",
       pattern: "TODO_COLOR_PATTERN",
     },
     typography: {
       enabled: true,
-      label: "Typographie",
+      label: "Typography",
       icon: "🔤",
       color: "oklch(0.723 0.22 70.08)",
       pattern: "TODO_TYPOGRAPHY_PATTERN",
@@ -335,7 +335,7 @@ const emptyPreset: Preset = {
     },
     spacing: {
       enabled: true,
-      label: "Espacement",
+      label: "Spacing",
       icon: "📏",
       color: "oklch(0.623 0.214 259.815)",
       pattern: "TODO_SPACING_PATTERN",
@@ -349,7 +349,7 @@ const emptyPreset: Preset = {
     },
     shadows: {
       enabled: true,
-      label: "Ombres",
+      label: "Shadows",
       icon: "🌫️",
       color: "oklch(0.723 0.219 149.579)",
       pattern: "TODO_SHADOW_PATTERN",

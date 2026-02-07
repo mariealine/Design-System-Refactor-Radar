@@ -6,7 +6,7 @@
  * and applied via the interactive wizard (`npx ds-coverage init`).
  */
 
-import { readFileSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 import { resolve, join } from "node:path";
 
 // ============================================
@@ -266,27 +266,88 @@ export function deepMerge(target: any, source: any): any {
   return result;
 }
 
-export async function loadConfig(projectRoot: string): Promise<DsCoverageConfig> {
+/**
+ * Load config from a specific path or auto-discover from CONFIG_FILE_NAMES.
+ * When configPath is provided, only that file is tried (and errors are thrown).
+ */
+export async function loadConfig(
+  projectRoot: string,
+  configPath?: string,
+): Promise<DsCoverageConfig> {
+  // If explicit config path, load it directly (errors are surfaced)
+  if (configPath) {
+    const fullPath = resolve(projectRoot, configPath);
+    const userConfig = await loadSingleConfig(fullPath, configPath);
+    const merged = deepMerge(DEFAULT_CONFIG, userConfig);
+    return validateConfig(merged);
+  }
+
+  // Auto-discover
   for (const fileName of CONFIG_FILE_NAMES) {
     const filePath = join(projectRoot, fileName);
-    try {
-      if (fileName.endsWith(".json")) {
-        const raw = readFileSync(filePath, "utf-8");
-        const userConfig = JSON.parse(raw);
-        return deepMerge(DEFAULT_CONFIG, userConfig);
-      }
 
-      // For .js, .mjs, .cjs, .ts — use dynamic import
-      const fileUrl = `file://${resolve(filePath)}`;
-      const mod = await import(fileUrl);
-      const userConfig = mod.default || mod;
-      return deepMerge(DEFAULT_CONFIG, userConfig);
-    } catch {
-      // File doesn't exist or can't be loaded — try next
-      continue;
+    // Only attempt to load files that actually exist
+    if (!existsSync(filePath)) continue;
+
+    try {
+      const userConfig = await loadSingleConfig(filePath, fileName);
+      const merged = deepMerge(DEFAULT_CONFIG, userConfig);
+      return validateConfig(merged);
+    } catch (err) {
+      // File exists but failed to load — surface the error (syntax error, etc.)
+      const message = err instanceof Error ? err.message : String(err);
+      throw new Error(
+        `Failed to load config file "${fileName}":\n  ${message}\n\n` +
+        `Fix the error in ${fileName}, or delete it and re-run \`npx ds-coverage init\`.`,
+      );
     }
   }
 
   // No config file found — use defaults
   return { ...DEFAULT_CONFIG };
+}
+
+async function loadSingleConfig(filePath: string, displayName: string): Promise<Record<string, unknown>> {
+  if (displayName.endsWith(".json")) {
+    const raw = readFileSync(filePath, "utf-8");
+    return JSON.parse(raw);
+  }
+
+  // For .js, .mjs, .cjs, .ts — use dynamic import
+  const fileUrl = `file://${resolve(filePath)}`;
+  const mod = await import(fileUrl);
+  return mod.default || mod;
+}
+
+// ============================================
+// CONFIG VALIDATION
+// ============================================
+
+const KNOWN_TOP_KEYS = new Set([
+  "scanDir", "extensions", "exclude",
+  "violations", "flags",
+  "componentAnalysis", "roadmap", "migration",
+  "dashboard", "output",
+]);
+
+function validateConfig(config: DsCoverageConfig): DsCoverageConfig {
+  // Warn about unknown top-level keys
+  for (const key of Object.keys(config)) {
+    if (!KNOWN_TOP_KEYS.has(key)) {
+      console.warn(`⚠️  ds-coverage config: unknown key "${key}" — will be ignored. Check for typos.`);
+    }
+  }
+
+  // Validate regex patterns
+  for (const [key, catConfig] of Object.entries(config.violations)) {
+    if (!catConfig.enabled) continue;
+    try {
+      new RegExp(catConfig.pattern, "g");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.warn(`⚠️  ds-coverage config: invalid regex in violations.${key}.pattern: ${message}`);
+    }
+  }
+
+  return config;
 }

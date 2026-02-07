@@ -12,14 +12,15 @@ import { fileURLToPath } from "node:url";
 import type { DsCoverageConfig } from "./config.js";
 import type { Report } from "./types.js";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+// Works in both ESM (import.meta.url) and CJS (tsup injects shims)
+const _currentDir = dirname(fileURLToPath(import.meta.url));
 
 export async function buildDashboard(
   report: Report,
   config: DsCoverageConfig,
 ): Promise<string> {
   // Read the HTML template
-  const templatePath = resolve(__dirname, "../templates/dashboard.html");
+  const templatePath = resolve(_currentDir, "../templates/dashboard.html");
   const template = await readFile(templatePath, "utf-8");
 
   // Build category metadata from config
