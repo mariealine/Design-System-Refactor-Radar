@@ -40,7 +40,7 @@ export default {
     // Example: Tailwind hardcoded colors
     // colors: {
     //   enabled: true,
-    //   label: "Couleurs",
+    //   label: "Colors",
     //   icon: "🎨",
     //   color: "oklch(0.637 0.237 25.331)",
     //   pattern: "(?:bg|text|border|ring)-(?:gray|red|blue|green)-\\d+",
@@ -49,7 +49,7 @@ export default {
     // Example: CSS hardcoded colors
     // colors: {
     //   enabled: true,
-    //   label: "Couleurs",
+    //   label: "Colors",
     //   icon: "🎨",
     //   color: "oklch(0.637 0.237 25.331)",
     //   pattern: "#[0-9a-fA-F]{3,8}\\b|\\brgba?\\s*\\(|\\bhsla?\\s*\\(",
@@ -58,7 +58,7 @@ export default {
     // Example: Typography
     // typography: {
     //   enabled: true,
-    //   label: "Typographie",
+    //   label: "Typography",
     //   icon: "🔤",
     //   color: "oklch(0.723 0.22 70.08)",
     //   pattern: "font-size\\s*:\\s*\\d+px",
