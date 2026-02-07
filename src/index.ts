@@ -173,6 +173,12 @@ export async function run(options: RunOptions = {}): Promise<RunResult> {
     log(`  Migration → ${migration.targetDS}:`);
     log(`    To migrate: ${ms.totalToMigrate} (${ms.totalMigrated} already migrated)`);
     log(`    Usages:     ${ms.totalUsages} in ${ms.totalFilesAffected} files`);
+    if (migration.legacyHtml && migration.legacyHtml.totalElements > 0) {
+      log(`    Legacy HTML: ${migration.legacyHtml.totalElements} elements in ${migration.legacyHtml.totalFiles} files`);
+      for (const [tag, count] of Object.entries(migration.legacyHtml.byElement)) {
+        if (count.usages > 0) log(`      <${tag}>: ${count.usages} (${count.files} files)`);
+      }
+    }
     if (ms.byComplexity.simple.count > 0) log(`    ✅ Simple:   ${ms.byComplexity.simple.count} (${ms.byComplexity.simple.usages} usages)`);
     if (ms.byComplexity.moderate.count > 0) log(`    ⚠️  Moderate: ${ms.byComplexity.moderate.count} (${ms.byComplexity.moderate.usages} usages)`);
     if (ms.byComplexity.complex.count > 0) log(`    🔴 Complex:  ${ms.byComplexity.complex.count} (${ms.byComplexity.complex.usages} usages)`);

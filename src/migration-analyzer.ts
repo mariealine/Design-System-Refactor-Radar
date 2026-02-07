@@ -15,6 +15,8 @@ import type {
   MigrationComponentReport,
   MigrationFileUsage,
   MigrationComplexity,
+  LegacyHtmlReport,
+  LegacyHtmlFileDetail,
 } from "./types.js";
 
 // ============================================
@@ -72,13 +74,13 @@ function detectComponentUsage(
     );
   }
 
-  // JSX usage: <ComponentName or </ComponentName
-  const jsxRegex = new RegExp(`</?${escapeRegex(componentName)}[\\s/>]`, "g");
+  // JSX usage: <ComponentName or </ComponentName (allow trailing space/slash/>, or end of line)
+  const jsxRegex = new RegExp(`</?${escapeRegex(componentName)}(?:[\\s/>]|$)`, "g");
 
   // Vue/Svelte template usage: <component-name or <ComponentName
   const kebabName = toKebabCase(componentName);
   const templateRegex = kebabName !== componentName.toLowerCase()
-    ? new RegExp(`</?${escapeRegex(kebabName)}[\\s/>]`, "g")
+    ? new RegExp(`</?${escapeRegex(kebabName)}(?:[\\s/>]|$)`, "g")
     : null;
 
   let hasImport = isNativeHtml; // Native HTML is always "imported" (global)
@@ -143,10 +145,14 @@ export function analyzeMigration(
   }
 
   const components: MigrationComponentReport[] = [];
+  /** Aggregate legacy HTML (native tags) for report */
+  const legacyByElement: Record<string, { usages: number; files: number }> = {};
+  const legacyByFile = new Map<string, Record<string, number>>();
 
   for (const mapping of config.migration.mappings) {
     const files: MigrationFileUsage[] = [];
     let totalUsages = 0;
+    const isNativeHtml = mapping.sourceImportPattern === HTML_NATIVE_PATTERN;
 
     for (const [filePath, content] of fileContents) {
       const relativePath = relative(scanDir, filePath);
@@ -168,6 +174,16 @@ export function analyzeMigration(
       });
 
       totalUsages += totalOccurrences;
+
+      if (isNativeHtml) {
+        const fileCounts = legacyByFile.get(relativePath) || {};
+        fileCounts[mapping.source] = (fileCounts[mapping.source] || 0) + totalOccurrences;
+        legacyByFile.set(relativePath, fileCounts);
+      }
+    }
+
+    if (isNativeHtml && totalUsages > 0) {
+      legacyByElement[mapping.source] = { usages: totalUsages, files: files.length };
     }
 
     // Sort files by total occurrences descending
@@ -218,8 +234,31 @@ export function analyzeMigration(
     for (const f of comp.files) allAffectedFiles.add(f.path);
   }
 
+  const legacyHtml: LegacyHtmlReport | null =
+    Object.keys(legacyByElement).length > 0
+      ? (() => {
+          let totalElements = 0;
+          for (const k of Object.keys(legacyByElement)) {
+            totalElements += legacyByElement[k].usages;
+          }
+          const fileDetails: LegacyHtmlFileDetail[] = Array.from(legacyByFile.entries())
+            .map(([path, byElement]) => {
+              const total = Object.values(byElement).reduce((a, b) => a + b, 0);
+              return { path, byElement, total };
+            })
+            .sort((a, b) => b.total - a.total);
+          return {
+            totalElements,
+            totalFiles: fileDetails.length,
+            byElement: legacyByElement,
+            fileDetails,
+          };
+        })()
+      : null;
+
   return {
     targetDS: config.migration.targetDS,
+    legacyHtml,
     summary: {
       totalMappings: components.length,
       totalToMigrate: toMigrate.length,

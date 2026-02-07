@@ -183,9 +183,36 @@ export interface MigrationFileUsage {
   totalOccurrences: number;
 }
 
+/** Per-element counts for legacy (native HTML) tracking */
+export interface LegacyHtmlElementCount {
+  usages: number;
+  files: number;
+}
+
+/** Per-file breakdown of legacy HTML elements */
+export interface LegacyHtmlFileDetail {
+  path: string;
+  byElement: Record<string, number>;
+  total: number;
+}
+
+/** Summary of hardcoded HTML elements (e.g. <input>, <textarea>) to migrate to DS components */
+export interface LegacyHtmlReport {
+  /** Total number of legacy HTML element usages across all mapped tags */
+  totalElements: number;
+  /** Number of files containing at least one legacy element */
+  totalFiles: number;
+  /** Counts per element (tag name), only for mappings with sourceImportPattern "html-native" */
+  byElement: Record<string, LegacyHtmlElementCount>;
+  /** Per-file breakdown (path → element counts), sorted by total descending */
+  fileDetails: LegacyHtmlFileDetail[];
+}
+
 export interface MigrationReport {
   /** Target design system name */
   targetDS: string;
+  /** Legacy HTML elements (hardcoded tags) to migrate; present when mappings include html-native */
+  legacyHtml: LegacyHtmlReport | null;
   /** Summary stats */
   summary: {
     /** Total mapping definitions (all components in config) */

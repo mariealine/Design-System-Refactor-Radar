@@ -488,6 +488,23 @@ function renderMigration() {
   if (migComplexityFilter !== 'all') components = components.filter(c => c.complexity === migComplexityFilter);
   if (migSearchQuery) { const q = migSearchQuery.toLowerCase(); components = components.filter(c => c.source.toLowerCase().includes(q) || c.target.toLowerCase().includes(q)); }
 
+  // Legacy HTML block (hardcoded <input>, <textarea>, etc.)
+  let legacyHtmlBlock = '';
+  if (mig.legacyHtml && mig.legacyHtml.totalElements > 0) {
+    const lh = mig.legacyHtml;
+    const byEl = Object.entries(lh.byElement).filter(([, c]) => c.usages > 0).sort((a, b) => b[1].usages - a[1].usages);
+    legacyHtmlBlock = `<div class="legacy-html-block" style="margin-bottom:var(--space-24);padding:var(--space-16);background:var(--surface-raised);border:1px solid var(--border-default);border-radius:var(--radius-m);">
+      <div class="ts-xs-m" style="margin-bottom:var(--space-8);color:var(--text-secondary)">📄 Legacy HTML elements</div>
+      <p class="ts-d-r" style="margin-bottom:var(--space-12)">Hardcoded native tags detected. Replace with design system components (see migration cards below).</p>
+      <div style="display:flex;flex-wrap:wrap;gap:var(--space-16);align-items:center;margin-bottom:var(--space-12)">
+        <div class="stat" style="min-width:80px"><div class="stat-value">${lh.totalElements}</div><div class="stat-label ts-xxs-m">Total</div></div>
+        <div class="stat" style="min-width:80px"><div class="stat-value">${lh.totalFiles}</div><div class="stat-label ts-xxs-m">Files</div></div>
+        ${byEl.map(([tag, c]) => `<span class="ts-xs-r" style="font-family:var(--font-family-mono)">&lt;${tag}&gt;</span> <span class="ts-xxs-m" style="color:var(--text-secondary)">${c.usages} (${c.files} files)</span>`).join('')}
+      </div>
+      ${lh.fileDetails.length > 0 ? `<details style="margin-top:var(--space-8)"><summary class="ts-xxs-m" style="cursor:pointer;color:var(--text-secondary)">▸ By file (${lh.fileDetails.length})</summary><ul class="mig-file-list" style="margin-top:var(--space-8);max-height:200px;overflow:auto">${lh.fileDetails.slice(0, 30).map(f => `<li class="mig-file-item"><span class="mig-file-path ts-xxs-r">${f.path}</span><span class="ts-xxs-m">${f.total} element${f.total > 1 ? 's' : ''}</span> ${Object.entries(f.byElement).map(([tag, n]) => `<span class="ts-xxs-r" style="color:var(--text-secondary)">&lt;${tag}&gt;: ${n}</span>`).join(' ')}</li>`).join('')}</ul>${lh.fileDetails.length > 30 ? `<p class="ts-xxs-r" style="color:var(--text-secondary);margin-top:var(--space-4)">… and ${lh.fileDetails.length - 30} more files</p>` : ''}</details>` : ''}
+    </div>`;
+  }
+
   // When showing only "to migrate" and none left, show success state
   if (migShowFilter === 'toMigrate' && totalToMigrate === 0) {
     const heroHtml = `<div class="hero" style="grid-template-columns: 1fr"><div class="hero-stats" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr))">
@@ -496,6 +513,7 @@ function renderMigration() {
     </div></div>`;
     return `<h2 class="ts-xl-sb" style="margin-bottom:var(--space-8)">Migration Plan → ${esc(mig.targetDS)}</h2>
     <p class="ts-d-r" style="color:var(--text-secondary);margin-bottom:var(--space-24)">All mapped components are migrated. No source usages detected.</p>
+    ${legacyHtmlBlock}
     ${heroHtml}
     <div class="empty-state" style="margin-top:var(--space-24)"><div class="icon">✅</div><h2 class="ts-xl-sb">All components migrated</h2><p class="ts-d-r" style="margin-top:var(--space-8)">Switch to "Migrated" to see the list, or add new mappings in your config.</p></div>`;
   }
@@ -562,6 +580,7 @@ function renderMigration() {
 
   return `<h2 class="ts-xl-sb" style="margin-bottom:var(--space-8)">Migration Plan → ${esc(mig.targetDS)}</h2>
     <p class="ts-d-r" style="color:var(--text-secondary);margin-bottom:var(--space-24)">Component-by-component migration plan. Each card includes guidelines, prop mapping, and affected files.</p>
+    ${legacyHtmlBlock}
     ${heroHtml}${toolbarHtml}${sectionsHtml}`;
 }
 
