@@ -6,7 +6,7 @@
  */
 
 import { readdir, readFile, stat } from "node:fs/promises";
-import { join, relative, extname } from "node:path";
+import { join, relative, extname, isAbsolute } from "node:path";
 import type { DsCoverageConfig } from "./config.js";
 import type { Violation, FileReport, CategorySummary } from "./types.js";
 
@@ -208,7 +208,7 @@ export async function scan(
 ): Promise<ScanResult> {
   // Normalize: use scanDirs if provided, otherwise derive from scanDir
   const scanDirs = config.scanDirs || [config.scanDir];
-  const scanDirsAbsolute = scanDirs.map((dir) => join(projectRoot, dir));
+  const scanDirsAbsolute = scanDirs.map((dir) => isAbsolute(dir) ? dir : join(projectRoot, dir));
 
   // Verify all scan directories exist
   for (const scanDir of scanDirsAbsolute) {

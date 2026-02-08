@@ -408,14 +408,8 @@ const KNOWN_TOP_KEYS = new Set([
 
 function validateConfig(config: DsCoverageConfig): DsCoverageConfig {
   // Warn about unknown top-level keys
-  // #region agent log
-  fetch('http://127.0.0.1:7243/ingest/814a5ae4-8c5f-48a6-9956-2a37bb1e2e37',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'config.ts:411',message:'validateConfig called',data:{knownKeys:Array.from(KNOWN_TOP_KEYS),configKeys:Object.keys(config)},timestamp:Date.now()})}).catch(()=>{});
-  // #endregion
   for (const key of Object.keys(config)) {
     if (!KNOWN_TOP_KEYS.has(key)) {
-      // #region agent log
-      fetch('http://127.0.0.1:7243/ingest/814a5ae4-8c5f-48a6-9956-2a37bb1e2e37',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'config.ts:415',message:'Unknown key detected',data:{key,knownKeys:Array.from(KNOWN_TOP_KEYS)},timestamp:Date.now()})}).catch(()=>{});
-      // #endregion
       console.warn(`⚠️  ds-coverage config: unknown key "${key}" — will be ignored. Check for typos.`);
     }
   }

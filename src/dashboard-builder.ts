@@ -7,17 +7,18 @@
  */
 
 import { readFile } from "node:fs/promises";
-import { resolve, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
+import { resolve } from "node:path";
 import type { DsCoverageConfig } from "./config.js";
 import type { Report } from "./types.js";
 
-// Works in both ESM (import.meta.url) and CJS (tsup injects shims)
-const _currentDir = dirname(fileURLToPath(import.meta.url));
+// ...
+
+const _currentDir = __dirname;
 
 export async function buildDashboard(
   report: Report,
   config: DsCoverageConfig,
+
 ): Promise<string> {
   // Read the HTML template
   const templatePath = resolve(_currentDir, "../templates/dashboard.html");
