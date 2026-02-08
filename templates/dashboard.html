@@ -222,6 +222,8 @@
 
     /* Migration */
     .mig-section { margin-bottom: var(--space-32); }
+    .mig-legacy-section { background: var(--bg-base-primary); border: 1px solid var(--border-default); border-radius: var(--radius-12); padding: var(--space-24); margin-bottom: var(--space-24); }
+    .mig-legacy-section .mig-legacy-title { font-size: var(--text-size-default); font-weight: var(--font-weight-semibold); color: var(--text-main); margin-bottom: var(--space-8); }
     .mig-section-header { display: flex; align-items: center; gap: var(--space-12); margin-bottom: var(--space-16); padding-bottom: var(--space-8); border-bottom: 2px solid var(--border-default); }
     .mig-section-badge { display: inline-flex; align-items: center; justify-content: center; padding: var(--space-4) var(--space-12); border-radius: var(--radius-6); font-weight: var(--font-weight-semibold); }
     .mig-section-badge.simple { background: oklch(0.982 0.018 155.826); color: oklch(0.527 0.154 150.069); }
@@ -472,9 +474,9 @@ function renderRoadmap() {
 
 function renderMigration() {
   const mig = report.migration;
-  if (!mig) return '<div class="empty-state"><div class="icon">🔄</div><h2 class="ts-xl-sb">No migration plan</h2><p class="ts-d-r" style="margin-top:var(--space-8)">Configure the <code>migration</code> section in your ds-coverage config</p></div>';
+  if (!mig) return '<div class="empty-state"><div class="icon">🔄</div><h2 class="ts-xl-sb">No migration plan</h2><p class="ts-d-r" style="margin-top:var(--space-8);color:var(--text-secondary)">Enable <code>migration.enabled</code> and add <code>migration.mappings</code> in your ds-coverage config, then run the scan again.</p></div>';
   const ms = mig.summary;
-  if (ms.totalMappings === 0) return '<div class="empty-state"><div class="icon">✅</div><h2 class="ts-xl-sb">No components to migrate</h2></div>';
+  if (ms.totalMappings === 0) return '<div class="empty-state"><div class="icon">📋</div><h2 class="ts-xl-sb">No component mappings yet</h2><p class="ts-d-r" style="margin-top:var(--space-8);color:var(--text-secondary)">Add entries to <code>migration.mappings</code> in your config to track migration from your current library to the target.</p></div>';
 
   // Support older reports without totalToMigrate/totalMigrated/migrated
   const totalToMigrate = ms.totalToMigrate ?? ms.totalMappings;
@@ -488,20 +490,20 @@ function renderMigration() {
   if (migComplexityFilter !== 'all') components = components.filter(c => c.complexity === migComplexityFilter);
   if (migSearchQuery) { const q = migSearchQuery.toLowerCase(); components = components.filter(c => c.source.toLowerCase().includes(q) || c.target.toLowerCase().includes(q)); }
 
-  // Legacy HTML block (hardcoded <input>, <textarea>, etc.)
+  // Legacy HTML block — same card style as rest of migration section
   let legacyHtmlBlock = '';
   if (mig.legacyHtml && mig.legacyHtml.totalElements > 0) {
     const lh = mig.legacyHtml;
     const byEl = Object.entries(lh.byElement).filter(([, c]) => c.usages > 0).sort((a, b) => b[1].usages - a[1].usages);
-    legacyHtmlBlock = `<div class="legacy-html-block" style="margin-bottom:var(--space-24);padding:var(--space-16);background:var(--surface-raised);border:1px solid var(--border-default);border-radius:var(--radius-m);">
-      <div class="ts-xs-m" style="margin-bottom:var(--space-8);color:var(--text-secondary)">📄 Legacy HTML elements</div>
-      <p class="ts-d-r" style="margin-bottom:var(--space-12)">Hardcoded native tags detected. Replace with design system components (see migration cards below).</p>
+    legacyHtmlBlock = `<div class="mig-section mig-legacy-section">
+      <div class="mig-legacy-title">📄 Legacy HTML elements</div>
+      <p class="ts-d-r" style="color:var(--text-secondary);margin-bottom:var(--space-16)">Hardcoded native tags detected. Replace with design system components (see migration cards below).</p>
       <div style="display:flex;flex-wrap:wrap;gap:var(--space-16);align-items:center;margin-bottom:var(--space-12)">
         <div class="stat" style="min-width:80px"><div class="stat-value">${lh.totalElements}</div><div class="stat-label ts-xxs-m">Total</div></div>
         <div class="stat" style="min-width:80px"><div class="stat-value">${lh.totalFiles}</div><div class="stat-label ts-xxs-m">Files</div></div>
         ${byEl.map(([tag, c]) => `<span class="ts-xs-r" style="font-family:var(--font-family-mono)">&lt;${tag}&gt;</span> <span class="ts-xxs-m" style="color:var(--text-secondary)">${c.usages} (${c.files} files)</span>`).join('')}
       </div>
-      ${lh.fileDetails.length > 0 ? `<details style="margin-top:var(--space-8)"><summary class="ts-xxs-m" style="cursor:pointer;color:var(--text-secondary)">▸ By file (${lh.fileDetails.length})</summary><ul class="mig-file-list" style="margin-top:var(--space-8);max-height:200px;overflow:auto">${lh.fileDetails.slice(0, 30).map(f => `<li class="mig-file-item"><span class="mig-file-path ts-xxs-r">${f.path}</span><span class="ts-xxs-m">${f.total} element${f.total > 1 ? 's' : ''}</span> ${Object.entries(f.byElement).map(([tag, n]) => `<span class="ts-xxs-r" style="color:var(--text-secondary)">&lt;${tag}&gt;: ${n}</span>`).join(' ')}</li>`).join('')}</ul>${lh.fileDetails.length > 30 ? `<p class="ts-xxs-r" style="color:var(--text-secondary);margin-top:var(--space-4)">… and ${lh.fileDetails.length - 30} more files</p>` : ''}</details>` : ''}
+      ${lh.fileDetails.length > 0 ? `<details style="margin-top:var(--space-8)"><summary class="ts-xxs-m" style="cursor:pointer;color:var(--text-secondary)">▾ By file (${lh.fileDetails.length})</summary><ul class="mig-file-list" style="margin-top:var(--space-8);max-height:200px;overflow:auto">${lh.fileDetails.slice(0, 30).map(f => `<li class="mig-file-item"><span class="mig-file-path ts-xxs-r">${f.path}</span><span class="ts-xxs-m">${f.total} element${f.total > 1 ? 's' : ''}</span> ${Object.entries(f.byElement).map(([tag, n]) => `<span class="ts-xxs-r" style="color:var(--text-secondary)">&lt;${tag}&gt;: ${n}</span>`).join(' ')}</li>`).join('')}</ul>${lh.fileDetails.length > 30 ? `<p class="ts-xxs-r" style="color:var(--text-secondary);margin-top:var(--space-4)">… and ${lh.fileDetails.length - 30} more files</p>` : ''}</details>` : ''}
     </div>`;
   }
 
