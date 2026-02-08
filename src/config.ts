@@ -31,6 +31,8 @@ export interface ViolationCategoryConfig {
 
 export interface ComponentApiConfig {
   enabled: boolean;
+  /** If true, show the "Components — API Redesign" tab in the dashboard (set by wizard: "plan to redesign APIs?") */
+  showApiRedesignTab?: boolean;
   /** Directories containing reusable components (relative to scanDir) */
   directories: string[];
   /** The "target" directory where new components should live */
@@ -168,6 +170,7 @@ export const DEFAULT_CONFIG: DsCoverageConfig = {
 
   componentAnalysis: {
     enabled: false,
+    showApiRedesignTab: true,
     directories: ["components/ui/"],
     primaryDirectory: "components/ui/",
     legacyDirectories: [],

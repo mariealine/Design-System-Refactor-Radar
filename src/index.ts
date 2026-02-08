@@ -4,7 +4,8 @@
  * Programmatic interface for running the scanner, analyzer, and dashboard builder.
  */
 
-import { join, relative } from "node:path";
+import { join, relative, resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 import { writeFile } from "node:fs/promises";
 import { loadConfig, deepMerge } from "./config.js";
 import type { DsCoverageConfig } from "./config.js";
@@ -14,6 +15,7 @@ import { analyzeComponents } from "./component-analyzer.js";
 import { buildRoadmap } from "./roadmap-builder.js";
 import { buildDashboard } from "./dashboard-builder.js";
 import { analyzeMigration } from "./migration-analyzer.js";
+import { discoverMigrationMappings } from "./migration-defaults.js";
 import type { Report } from "./types.js";
 
 export type { DsCoverageConfig } from "./config.js";
@@ -81,7 +83,30 @@ export async function run(options: RunOptions = {}): Promise<RunResult> {
   const roadmap = buildRoadmap(fileReports, config);
 
   // 3b. Analyze migration (if enabled)
-  const migration = analyzeMigration(fileContents, scanDir, config);
+  // When migration is enabled but mappings are empty, auto-discover from codebase
+  let migrationConfig = config;
+  if (
+    config.migration.enabled &&
+    config.migration.mappings.length === 0 &&
+    config.migration.targetDS
+  ) {
+    const discovered = discoverMigrationMappings(
+      fileContents,
+      componentApi,
+      scanDir,
+      config,
+    );
+    if (discovered.length > 0) {
+      migrationConfig = {
+        ...config,
+        migration: {
+          ...config.migration,
+          mappings: discovered,
+        },
+      };
+    }
+  }
+  const migration = analyzeMigration(fileContents, scanDir, migrationConfig);
 
   // 4. Build summary
   const filesWithViolations = fileReports.filter((f) => f.totalViolations > 0);
@@ -101,6 +126,7 @@ export async function run(options: RunOptions = {}): Promise<RunResult> {
 
   const report: Report = {
     generatedAt: new Date().toISOString(),
+    projectRoot: resolve(projectRoot),
     scanDir: relative(projectRoot, scanDir),
     summary: {
       totalFiles,
@@ -186,7 +212,7 @@ export async function run(options: RunOptions = {}): Promise<RunResult> {
 
   if (!options.dryRun) {
     log(`\n  Report:    ${relative(projectRoot, reportJsonPath)}`);
-    log(`  Dashboard: ${relative(projectRoot, dashboardPath)}\n`);
+    log(`  Dashboard: ${pathToFileURL(dashboardPath).href}\n`);
   }
 
   return { report, dashboardHtml, reportJsonPath, dashboardPath };

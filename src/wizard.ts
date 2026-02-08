@@ -25,6 +25,8 @@ export interface WizardAnswers {
   componentArchitecture: ComponentArchitecture;
   /** Target DS name for migration (empty = no migration) */
   migrationTargetDS: string;
+  /** If true, show the "Components — API Redesign" tab in the dashboard */
+  apiRedesignPlanned: "yes" | "no";
 }
 
 export type CssMethodology =
@@ -180,6 +182,12 @@ function showSectionIfFirst(step: number): void {
     console.log(`  ${COPY.sections.migration.title}`);
     console.log(`  ${COPY.sections.migration.hint}`);
     console.log(sep);
+  } else if (step === 9) {
+    console.log("");
+    console.log(sep);
+    console.log("  📊  Dashboard");
+    console.log("  Choose which tabs to show in the coverage dashboard.");
+    console.log(sep);
   }
 }
 
@@ -315,6 +323,18 @@ async function runSingleStep(
     return a;
   }
 
+  if (step === 9) {
+    if (COPY.steps.apiRedesignPlanned.hint) console.log(`  💡 ${COPY.steps.apiRedesignPlanned.hint}\n`);
+    a.apiRedesignPlanned = (await askChoice(
+      rl,
+      COPY.steps.apiRedesignPlanned.question,
+      COPY.steps.apiRedesignPlanned.options,
+      1,
+      a.apiRedesignPlanned,
+    )) as "yes" | "no";
+    return a;
+  }
+
   return a;
 }
 
@@ -336,6 +356,7 @@ function showSummary(a: WizardState): void {
   console.log(`    • ${COPY.summary.labels.componentArchitecture}: ${a.componentArchitecture ?? ""}`);
   console.log(`    • ${COPY.summary.labels.tokenCategories}: ${a.tokenCategories?.join(", ") ?? ""}`);
   if (a.migrationTargetDS) console.log(`    • ${COPY.summary.labels.migration}: ${a.migrationTargetDS}`);
+  console.log(`    • ${COPY.summary.labels.apiRedesignPlanned}: ${a.apiRedesignPlanned === "yes" ? "Yes (show tab)" : "No (hide tab)"}`);
   console.log("");
 }
 
@@ -363,9 +384,9 @@ export async function runWizard(): Promise<WizardAnswers> {
     let state: WizardState = {};
     let step = 0;
 
-    while (step <= 8) {
+    while (step <= 9) {
       state = await runSingleStep(rl, state, step);
-      if (step < 8) {
+      if (step < 9) {
         const nav = await ask(rl, COPY.navigation.nextOrBack);
         if (nav.toLowerCase() === "b" && step > 0) {
           step--;
@@ -399,9 +420,9 @@ export async function runWizard(): Promise<WizardAnswers> {
       }
 
       step = editNum - 1;
-      while (step <= 8) {
+      while (step <= 9) {
         state = await runSingleStep(rl, state, step);
-        if (step < 8) {
+        if (step < 9) {
           const nav = await ask(rl, COPY.navigation.nextOrBack);
           if (nav.toLowerCase() === "b" && step > 0) {
             step--;
@@ -441,6 +462,7 @@ export function buildConfigFromAnswers(answers: WizardAnswers): Partial<DsCovera
   const requireCVA = answers.componentArchitecture === "cva";
   const componentAnalysis: DsCoverageConfig["componentAnalysis"] = {
     enabled: true,
+    showApiRedesignTab: answers.apiRedesignPlanned === "yes",
     directories: [`${answers.componentDir}/`],
     primaryDirectory: `${answers.componentDir}/`,
     legacyDirectories: [],

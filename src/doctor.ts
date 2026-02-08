@@ -108,10 +108,15 @@ export async function doctor(options: DoctorOptions = {}): Promise<void> {
 
   // 7. Migration
   if (config.migration.enabled) {
-    if (config.migration.mappings.length === 0) {
-      checks.push({ label: "Migration mappings", status: "warn", detail: "Migration is enabled but no mappings are defined. Add entries to migration.mappings." });
+    const targetDS = (config.migration.targetDS || "").toLowerCase();
+    const autoDiscover = config.migration.mappings.length === 0 && targetDS.includes("shadcn");
+    if (config.migration.mappings.length === 0 && !autoDiscover) {
+      checks.push({ label: "Migration mappings", status: "warn", detail: "Migration is enabled but no mappings are defined. Add entries to migration.mappings (or use targetDS 'shadcn/ui' for auto-discovery)." });
     } else {
-      checks.push({ label: "Migration mappings", status: "pass", detail: `${config.migration.mappings.length} mappings → ${config.migration.targetDS}` });
+      const detail = autoDiscover
+        ? `Mappings will be auto-discovered from codebase → ${config.migration.targetDS}`
+        : `${config.migration.mappings.length} mappings → ${config.migration.targetDS}`;
+      checks.push({ label: "Migration mappings", status: "pass", detail });
     }
   } else {
     checks.push({ label: "Migration", status: "pass", detail: "Disabled (optional)" });

@@ -240,6 +240,8 @@ export interface MigrationReport {
 
 export interface Report {
   generatedAt: string;
+  /** Absolute project root path (for "open in IDE" links in the dashboard). */
+  projectRoot?: string;
   scanDir: string;
   summary: {
     totalFiles: number;

@@ -120,6 +120,14 @@ export const COPY = {
       otherPrompt: "Enter the target design system or library name:",
       default: "shadcn/ui",
     },
+    apiRedesignPlanned: {
+      question: "Do you plan to redesign your component APIs (props, variants, CVA, etc.)?",
+      hint: "If yes, the dashboard will show the 'Components — API Redesign' tab with an audit of your components. If no, that tab will be hidden.",
+      options: [
+        { key: "yes", label: "Yes, I plan to redesign or standardize component APIs" },
+        { key: "no", label: "No, skip the API Redesign tab in the dashboard" },
+      ],
+    },
   },
 
   navigation: {
@@ -144,6 +152,7 @@ export const COPY = {
       componentArchitecture: "Component variants",
       tokenCategories: "Checks enabled",
       migration: "Migration target",
+      apiRedesignPlanned: "API Redesign tab",
     },
     confirm: "  ✅ Confirm and generate? (Y/n) → ",
     whichStepEdit: "  ✏️  Which step do you want to edit?",
@@ -164,4 +173,5 @@ export const WIZARD_STEP_LABELS = [
   COPY.steps.componentArchitecture.question,
   COPY.steps.tokenCategories.question,
   "Migration",
+  COPY.steps.apiRedesignPlanned.question,
 ] as const;

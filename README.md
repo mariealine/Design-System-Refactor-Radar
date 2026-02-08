@@ -25,6 +25,35 @@ npx ds-coverage init
 npx ds-coverage --open
 ```
 
+### Manual installation (without npm)
+
+To use ds-coverage locally without publishing to npm (e.g. from a clone of the repo):
+
+1. **Clone and build the package**
+
+```bash
+git clone <ds-coverage-repo-url> ds-coverage
+cd ds-coverage
+npm install
+npm run build
+```
+
+2. **Use it from another project**
+
+From a repo at the same level as `ds-coverage` (e.g. `valuation-pack` next to `ds-coverage`):
+
+- In the project’s `package.json`, add a devDependency:
+
+```json
+"devDependencies": {
+  "ds-coverage": "file:../ds-coverage"
+}
+```
+
+- Then install dependencies (`pnpm install`, `npm install`, or `yarn install`).
+
+After that, `npx ds-coverage`, `npx ds-coverage init`, etc. use the local built version.
+
 The `init` wizard asks about your stack (CSS methodology, framework, component architecture) and generates:
 
 - `ds-coverage.config.js` — your config file with patterns matching your stack
