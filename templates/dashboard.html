@@ -146,6 +146,20 @@
     .violation-item { display: flex; gap: var(--space-12); padding: var(--space-4) var(--space-8); border-radius: var(--radius-4); }
     .violation-item:hover { background: var(--bg-base-primary-hover); }
     .violation-line { color: var(--text-tertiary); min-width: 50px; text-align: right; }
+    .violation-line a { color: var(--color-accent); text-decoration: none; }
+    .violation-line a:hover { text-decoration: underline; }
+    /* Violation accordion in detail panel */
+    .violation-accordion-item { border: 1px solid var(--border-default); border-radius: var(--radius-6); margin-bottom: var(--space-6); overflow: hidden; }
+    .violation-accordion-item:last-child { margin-bottom: 0; }
+    .violation-accordion-header { display: flex; align-items: center; gap: var(--space-12); padding: var(--space-8) var(--space-12); cursor: pointer; background: var(--bg-base-primary); transition: background 0.15s; }
+    .violation-accordion-header:hover { background: var(--bg-base-primary-hover); }
+    .violation-accordion-header .violation-line { min-width: 44px; }
+    .violation-accordion-header .violation-match { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .violation-accordion-chevron { color: var(--text-tertiary); font-size: 10px; transition: transform 0.2s; flex-shrink: 0; }
+    .violation-accordion-item.open .violation-accordion-chevron { transform: rotate(90deg); }
+    .violation-accordion-body { display: none; padding: var(--space-8) var(--space-12); background: var(--bg-base-primary-hover); border-top: 1px solid var(--border-default); }
+    .violation-accordion-item.open .violation-accordion-body { display: block; }
+    .violation-accordion-body .violation-context { font-size: var(--text-size-xxs); word-break: break-all; white-space: pre-wrap; }
     .violation-match { color: var(--color-danger); font-weight: var(--font-weight-semibold); min-width: 160px; }
     .violation-context { color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
@@ -168,8 +182,6 @@
     .phase-card.list-card-selected { border-color: var(--color-accent); box-shadow: 0 0 0 1px var(--color-accent); }
     .phase-card-body { display: none; margin-top: var(--space-12); padding-top: var(--space-12); border-top: 1px solid var(--border-default); }
     .phase-card-body.open { display: block; }
-    .phase-chevron { color: var(--text-tertiary); margin-right: var(--space-8); transition: transform 0.2s; }
-    .phase-chevron.open { transform: rotate(90deg); }
     .phase-header { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-16); margin-bottom: var(--space-12); }
     .phase-title { display: flex; align-items: center; gap: var(--space-8); }
     .phase-number { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: var(--color-accent); color: var(--text-complementary); flex-shrink: 0; }
@@ -178,10 +190,7 @@
     .phase-stat-value { font-weight: var(--font-weight-bold); }
     .phase-stat-label { color: var(--text-tertiary); }
     .phase-files { border-top: 1px solid var(--border-default); padding-top: var(--space-12); }
-    .phase-files-toggle { background: none; border: none; color: var(--color-accent); cursor: pointer; font-family: var(--font-family); padding: 0; }
-    .phase-files-toggle:hover { text-decoration: underline; }
-    .phase-file-list { display: none; margin-top: var(--space-8); }
-    .phase-file-list.open { display: block; }
+    .phase-file-list { margin-top: var(--space-8); }
     .phase-file-item { display: flex; justify-content: space-between; padding: var(--space-4) var(--space-8); border-radius: var(--radius-4); }
     .phase-file-item:hover { background: var(--bg-base-primary-hover); }
     .phase-file-path { font-family: var(--font-family-mono); color: var(--text-primary); }
@@ -243,6 +252,8 @@
 
     /* Migration */
     .mig-section { margin-bottom: var(--space-32); }
+    .mig-legacy-section { background: var(--bg-base-primary); border: 1px solid var(--border-default); border-radius: var(--radius-12); padding: var(--space-24); margin-bottom: var(--space-24); }
+    .mig-legacy-section .mig-legacy-title { font-size: var(--text-size-default); font-weight: var(--font-weight-semibold); color: var(--text-main); margin-bottom: var(--space-8); }
     .mig-section-header { display: flex; align-items: center; gap: var(--space-12); margin-bottom: var(--space-16); padding-bottom: var(--space-8); border-bottom: 2px solid var(--border-default); }
     .mig-section-badge { display: inline-flex; align-items: center; justify-content: center; padding: var(--space-4) var(--space-12); border-radius: var(--radius-6); font-weight: var(--font-weight-semibold); }
     .mig-section-badge.simple { background: oklch(0.982 0.018 155.826); color: oklch(0.527 0.154 150.069); }
@@ -251,17 +262,15 @@
     .mig-card { background: var(--bg-base-primary); border: 1px solid var(--border-default); border-radius: var(--radius-12); padding: var(--space-24); margin-bottom: var(--space-12); transition: border-color 0.15s; cursor: pointer; }
     .mig-card:hover { border-color: var(--border-hover); }
     .mig-card.list-card-selected { border-color: var(--color-accent); box-shadow: 0 0 0 1px var(--color-accent); }
+    .mig-card-title { font-size: var(--text-size-large); font-weight: var(--font-weight-semibold); color: var(--text-main); margin-bottom: var(--space-12); }
     .mig-card-header { cursor: pointer; }
     .mig-card-body { display: none; }
     .mig-card-body.open { display: block; }
-    .mig-card-chevron { color: var(--text-tertiary); margin-right: var(--space-8); transition: transform 0.2s; }
-    .mig-card-chevron.open { transform: rotate(90deg); }
     .mig-card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-16); margin-bottom: var(--space-12); }
     .mig-swap { display: flex; align-items: center; gap: var(--space-8); }
     .mig-comp-name { font-weight: var(--font-weight-semibold); padding: var(--space-4) var(--space-12); border-radius: var(--radius-6); font-family: var(--font-family-mono); }
     .mig-comp-name.source { background: oklch(0.971 0.013 17.38); color: oklch(0.505 0.213 27.518); }
     .mig-comp-name.target { background: oklch(0.982 0.018 155.826); color: oklch(0.527 0.154 150.069); }
-    .mig-arrow { color: var(--text-tertiary); font-size: 18px; }
     .mig-meta { display: flex; gap: var(--space-16); flex-wrap: wrap; margin-bottom: var(--space-12); }
     .mig-meta-item { display: flex; align-items: center; gap: var(--space-4); color: var(--text-secondary); }
     .mig-meta-value { font-weight: var(--font-weight-semibold); color: var(--text-main); }
@@ -273,8 +282,7 @@
     .mig-breaking-item { display: flex; align-items: flex-start; gap: var(--space-6); padding: var(--space-2) 0; }
     .mig-files-toggle { background: none; border: none; color: var(--color-accent); cursor: pointer; font-family: var(--font-family); padding: 0; }
     .mig-files-toggle:hover { text-decoration: underline; }
-    .mig-file-list { display: none; margin-top: var(--space-8); }
-    .mig-file-list.open { display: block; }
+    .mig-file-list { margin-top: var(--space-8); }
     .mig-file-item { display: flex; justify-content: space-between; align-items: center; padding: var(--space-4) var(--space-8); border-radius: var(--radius-4); }
     .mig-file-item:hover { background: var(--bg-base-primary-hover); }
     .mig-file-path { font-family: var(--font-family-mono); color: var(--text-primary); }
@@ -309,7 +317,7 @@
 // ============================================
 // Dashboard — reads categories and config from embedded data
 // ============================================
-const CFG = window.__DS_CONFIG__ || { title: 'DS Coverage', subtitle: '', categories: {}, componentAnalysisEnabled: false, roadmapEnabled: false, migrationEnabled: false, expectedProps: [], expectedSizes: [], forbiddenProps: [], forbiddenSizes: [] };
+const CFG = window.__DS_CONFIG__ || { title: 'DS Coverage', subtitle: '', categories: {}, componentAnalysisEnabled: false, apiRedesignTabEnabled: false, roadmapEnabled: false, migrationEnabled: false, expectedProps: [], expectedSizes: [], forbiddenProps: [], forbiddenSizes: [] };
 const CATS = CFG.categories;
 const CAT_KEYS = Object.keys(CATS);
 
@@ -388,7 +396,7 @@ function getFilteredFiles() {
 function renderHeader() {
   const s = report.summary;
   const tabs = [{ id: 'metrics', label: 'Metrics — App' }];
-  if (CFG.componentAnalysisEnabled) tabs.push({ id: 'tokens', label: 'Metrics — Design System' }, { id: 'api', label: 'Components — API Redesign' });
+  if (CFG.componentAnalysisEnabled) { tabs.push({ id: 'tokens', label: 'Metrics — Design System' }); if (CFG.apiRedesignTabEnabled) tabs.push({ id: 'api', label: 'Components — API Redesign' }); }
   if (CFG.migrationEnabled) tabs.push({ id: 'migration', label: 'Migration Plan' });
   if (CFG.roadmapEnabled) tabs.push({ id: 'roadmap', label: 'Refactoring Roadmap' });
   return `<div class="header"><div><h1>${esc(CFG.title)}</h1><div class="subtitle ts-d-r">${esc(CFG.subtitle)}</div></div><div><span class="timestamp ts-xxs-r">Generated: ${new Date(report.generatedAt).toLocaleString()}</span></div></div><div class="tab-bar">${tabs.map(t => `<button class="tab-btn ts-d-m ${activeTab === t.id ? 'active' : ''}" onclick="switchTab('${t.id}')">${t.label}</button>`).join('')}</div>`;
@@ -499,8 +507,8 @@ function renderApiRework() {
 function renderRoadmap() {
   const r = report.roadmap;
   if (!r) return '<div class="empty-state ts-d-r">No roadmap data.</div>';
-  const phasesHtml = r.phases.map((p, i) => { const filesOpen = openPhases.has(p.id); const cardOpen = openPhaseCards.has(p.id);
-    return `<div class="phase-card ${cardOpen ? 'list-card-selected' : ''}" onclick="togglePhaseCard('${p.id}')"><div class="phase-header"><span class="phase-chevron ${cardOpen ? 'open' : ''}">▸</span><div class="phase-title"><span class="phase-number ts-xxs-m">${i+1}</span><span class="ts-l-m">${p.title}</span></div></div><div class="phase-stats"><div><span class="phase-stat-value ts-d-m">${p.filesCount}</span><span class="phase-stat-label ts-xxs-r"> files</span></div><div><span class="phase-stat-value ts-d-m">${p.violationsCount}</span><span class="phase-stat-label ts-xxs-r"> violations</span></div></div><div class="phase-card-body ${cardOpen?'open':''}"><div class="phase-desc ts-xs-r">${p.description}</div>${p.businessCase?`<div class="biz-case"><div class="ts-xxs-m" style="color:var(--text-secondary);margin-bottom:var(--space-4);text-transform:uppercase;letter-spacing:0.05em">Why prioritize</div><div class="ts-xs-r" style="color:var(--text-primary)">${p.businessCase}</div></div>`:''}<div class="phase-files"><button class="phase-files-toggle ts-xs-m" onclick="event.stopPropagation();togglePhaseFiles('${p.id}')">${filesOpen?'▾ Hide files':'▸ Show files'} (${p.files.length})</button><div class="phase-file-list ${filesOpen?'open':''}">${p.files.map(f=>`<div class="phase-file-item"><span class="phase-file-path ts-xxs-r">${f.path}</span><span class="phase-file-count ts-xxs-m">${f.count}</span></div>`).join('')}</div></div></div></div>`; }).join('');
+  const phasesHtml = r.phases.map((p, i) => { const cardOpen = openPhaseCards.has(p.id);
+    return `<div class="phase-card ${cardOpen ? 'list-card-selected' : ''}" onclick="togglePhaseCard('${p.id}')"><div class="phase-header"><div class="phase-title"><span class="phase-number ts-xxs-m">${i+1}</span><span class="ts-l-m">${p.title}</span></div></div><div class="phase-stats"><div><span class="phase-stat-value ts-d-m">${p.filesCount}</span><span class="phase-stat-label ts-xxs-r"> files</span></div><div><span class="phase-stat-value ts-d-m">${p.violationsCount}</span><span class="phase-stat-label ts-xxs-r"> violations</span></div></div><div class="phase-card-body ${cardOpen?'open':''}" onclick="event.stopPropagation()"><div class="phase-desc ts-xs-r">${p.description}</div>${p.businessCase?`<div class="biz-case"><div class="ts-xxs-m" style="color:var(--text-secondary);margin-bottom:var(--space-4);text-transform:uppercase;letter-spacing:0.05em">Why prioritize</div><div class="ts-xs-r" style="color:var(--text-primary)">${p.businessCase}</div></div>`:''}<div class="phase-files"><div class="ts-xxs-m" style="color:var(--text-secondary);margin-bottom:var(--space-8)">📄 Fichiers concernés (${p.files.length})</div><div class="phase-file-list">${p.files.map(f=>`<div class="phase-file-item"><span class="phase-file-path ts-xxs-r">${f.path}</span><span class="phase-file-count ts-xxs-m">${f.count}</span></div>`).join('')}</div></div></div></div>`; }).join('');
   const topDirs = r.directories.slice(0, 15);
   const dirHtml = topDirs.map(d => `<div class="dir-card"><div class="ts-xxs-m" style="font-family:var(--font-family-mono);margin-bottom:var(--space-8);word-break:break-all">${d.path}/</div><div class="dir-bar"><div class="dir-bar-fill" style="width:${d.coveragePercent}%;background:${getCoverageColor(d.coveragePercent)}"></div></div><div class="dir-stats ts-xxs-r"><span>${d.coveragePercent}% compliant</span><span>${d.filesWithViolations}/${d.totalFiles} with debt</span><span>${d.totalViolations} violations</span></div></div>`).join('');
   return `<h2 class="ts-xl-sb" style="margin-bottom:var(--space-8)">Refactoring Roadmap</h2><p class="ts-d-r" style="color:var(--text-secondary);margin-bottom:var(--space-24)">Migration phases ordered by impact. Each includes a business case and affected files.</p>${phasesHtml}<h2 class="ts-xl-sb" style="margin-top:var(--space-32);margin-bottom:var(--space-8)">Coverage by Directory</h2><p class="ts-d-r" style="color:var(--text-secondary);margin-bottom:var(--space-16)">Directories sorted by most violations.</p><div class="dir-grid">${dirHtml}</div>`;
@@ -510,7 +518,7 @@ function renderMigration() {
   const mig = report.migration;
   if (!mig) return '<div class="empty-state"><div class="icon">🔄</div><h2 class="ts-xl-sb">No migration plan</h2><p class="ts-d-r" style="margin-top:var(--space-8)">Configure the <code>migration</code> section in your ds-coverage config</p></div>';
   const ms = mig.summary;
-  if (ms.totalMappings === 0) return '<div class="empty-state"><div class="icon">✅</div><h2 class="ts-xl-sb">No components to migrate</h2></div>';
+  if (ms.totalMappings === 0) return `<div class="empty-state"><div class="icon">📋</div><h2 class="ts-xl-sb">Migration → ${esc(mig.targetDS)}</h2><p class="ts-d-r" style="margin-top:var(--space-8)">You have enabled migration to <strong>${esc(mig.targetDS)}</strong>. Add <code>migration.mappings</code> in your <code>ds-coverage.config</code> to define which components to migrate (source → target). Then run the scanner again to see the migration plan.</p></div>`;
 
   // Support older reports without totalToMigrate/totalMigrated/migrated
   const totalToMigrate = ms.totalToMigrate ?? ms.totalMappings;
@@ -524,20 +532,20 @@ function renderMigration() {
   if (migComplexityFilter !== 'all') components = components.filter(c => c.complexity === migComplexityFilter);
   if (migSearchQuery) { const q = migSearchQuery.toLowerCase(); components = components.filter(c => c.source.toLowerCase().includes(q) || c.target.toLowerCase().includes(q)); }
 
-  // Legacy HTML block (hardcoded <input>, <textarea>, etc.)
+  // Legacy HTML block — integrated into migration section (same card style as hero/sections)
   let legacyHtmlBlock = '';
   if (mig.legacyHtml && mig.legacyHtml.totalElements > 0) {
     const lh = mig.legacyHtml;
     const byEl = Object.entries(lh.byElement).filter(([, c]) => c.usages > 0).sort((a, b) => b[1].usages - a[1].usages);
-    legacyHtmlBlock = `<div class="legacy-html-block" style="margin-bottom:var(--space-24);padding:var(--space-16);background:var(--surface-raised);border:1px solid var(--border-default);border-radius:var(--radius-m);">
-      <div class="ts-xs-m" style="margin-bottom:var(--space-8);color:var(--text-secondary)">📄 Legacy HTML elements</div>
-      <p class="ts-d-r" style="margin-bottom:var(--space-12)">Hardcoded native tags detected. Replace with design system components (see migration cards below).</p>
+    legacyHtmlBlock = `<div class="mig-section mig-legacy-section">
+      <div class="mig-legacy-title">📄 Legacy HTML elements</div>
+      <p class="ts-d-r" style="color:var(--text-secondary);margin-bottom:var(--space-16)">Hardcoded native tags detected. Replace with design system components (see migration cards below).</p>
       <div style="display:flex;flex-wrap:wrap;gap:var(--space-16);align-items:center;margin-bottom:var(--space-12)">
         <div class="stat" style="min-width:80px"><div class="stat-value">${lh.totalElements}</div><div class="stat-label ts-xxs-m">Total</div></div>
         <div class="stat" style="min-width:80px"><div class="stat-value">${lh.totalFiles}</div><div class="stat-label ts-xxs-m">Files</div></div>
         ${byEl.map(([tag, c]) => `<span class="ts-xs-r" style="font-family:var(--font-family-mono)">&lt;${tag}&gt;</span> <span class="ts-xxs-m" style="color:var(--text-secondary)">${c.usages} (${c.files} files)</span>`).join('')}
       </div>
-      ${lh.fileDetails.length > 0 ? `<details style="margin-top:var(--space-8)"><summary class="ts-xxs-m" style="cursor:pointer;color:var(--text-secondary)">▸ By file (${lh.fileDetails.length})</summary><ul class="mig-file-list" style="margin-top:var(--space-8);max-height:200px;overflow:auto">${lh.fileDetails.slice(0, 30).map(f => `<li class="mig-file-item"><span class="mig-file-path ts-xxs-r">${f.path}</span><span class="ts-xxs-m">${f.total} element${f.total > 1 ? 's' : ''}</span> ${Object.entries(f.byElement).map(([tag, n]) => `<span class="ts-xxs-r" style="color:var(--text-secondary)">&lt;${tag}&gt;: ${n}</span>`).join(' ')}</li>`).join('')}</ul>${lh.fileDetails.length > 30 ? `<p class="ts-xxs-r" style="color:var(--text-secondary);margin-top:var(--space-4)">… and ${lh.fileDetails.length - 30} more files</p>` : ''}</details>` : ''}
+      ${lh.fileDetails.length > 0 ? `<details style="margin-top:var(--space-8)"><summary class="ts-xxs-m" style="cursor:pointer;color:var(--text-secondary)">▾ By file (${lh.fileDetails.length})</summary><ul class="mig-file-list" style="margin-top:var(--space-8);max-height:200px;overflow:auto">${lh.fileDetails.slice(0, 30).map(f => `<li class="mig-file-item"><span class="mig-file-path ts-xxs-r">${f.path}</span><span class="ts-xxs-m">${f.total} element${f.total > 1 ? 's' : ''}</span> ${Object.entries(f.byElement).map(([tag, n]) => `<span class="ts-xxs-r" style="color:var(--text-secondary)">&lt;${tag}&gt;: ${n}</span>`).join(' ')}</li>`).join('')}</ul>${lh.fileDetails.length > 30 ? `<p class="ts-xxs-r" style="color:var(--text-secondary);margin-top:var(--space-4)">… and ${lh.fileDetails.length - 30} more files</p>` : ''}</details>` : ''}
     </div>`;
   }
 
@@ -647,13 +655,13 @@ function renderMigCard(c) {
     </div>`;
   }
 
-  const filesHtml = c.files.length > 0 ? `<div style="border-top:1px solid var(--border-default);padding-top:var(--space-12)">
-    <button class="mig-files-toggle ts-xs-m" onclick="event.stopPropagation();toggleMigFiles('${c.source.replace(/'/g,"\\'")}')">
-      ${isOpen ? '▾ Hide files' : '▸ Show files'} (${c.filesAffected})
-    </button>
-    <div class="mig-file-list ${isOpen ? 'open' : ''}">
+  const pr = (typeof report !== 'undefined' && report.projectRoot) ? report.projectRoot : '';
+  const fileLink = (path) => pr ? `<a href="cursor://file/${encodeURI((pr + '/' + path).replace(/\\/g, '/'))}:1" onclick="event.stopPropagation()" class="mig-file-path ts-xxs-r" style="color:var(--color-accent);text-decoration:underline">${esc(path)}</a>` : `<span class="mig-file-path ts-xxs-r">${esc(path)}</span>`;
+  const filesHtml = c.files.length > 0 ? `<div class="mig-files-section" style="border-top:1px solid var(--border-default);padding-top:var(--space-12)">
+    <div class="ts-xxs-m" style="color:var(--text-secondary);margin-bottom:var(--space-8)">📄 Fichiers concernés (${c.filesAffected})</div>
+    <div class="mig-file-list">
       ${c.files.map(f => `<div class="mig-file-item">
-        <span class="mig-file-path ts-xxs-r">${f.path}</span>
+        ${fileLink(f.path)}
         <span class="mig-file-count ts-xxs-m">${f.totalOccurrences} occurrence${f.totalOccurrences > 1 ? 's' : ''}</span>
       </div>`).join('')}
     </div>
@@ -663,12 +671,13 @@ function renderMigCard(c) {
   const cardStyle = c.migrated ? 'opacity:0.85;border-color:var(--color-success);' : '';
   const migOpen = openMigDetails.has(c.source);
   const bodyContent = guidelinesHtml || propsHtml || breakingHtml || filesHtml ? `${guidelinesHtml}${propsHtml}${breakingHtml}${filesHtml}` : '';
+  const titleText = c.source === c.target ? esc(c.source) : `${esc(c.source)} → ${esc(c.target)}`;
   return `<div class="mig-card ${migOpen ? 'list-card-selected' : ''}" style="${cardStyle}" onclick="toggleMigDetail('${c.source.replace(/'/g,"\\'")}')">
+    <h3 class="mig-card-title">${titleText}</h3>
     <div class="mig-card-header">
-      <span class="mig-card-chevron ${migOpen ? 'open' : ''}">▸</span>
       <div class="mig-swap">
         <span class="mig-comp-name source ts-xs-m">${esc(c.source)}</span>
-        <span class="mig-arrow">→</span>
+        <span style="color:var(--text-tertiary);margin:0 var(--space-4)">·</span>
         <span class="mig-comp-name target ts-xs-m">${esc(c.target)}</span>
       </div>
       <div style="display:flex;align-items:center;gap:var(--space-12);flex-wrap:wrap">
@@ -682,7 +691,7 @@ function renderMigCard(c) {
       <div class="mig-meta-item ts-xxs-r"><span class="mig-meta-value">${c.filesAffected}</span> files</div>
       <div class="mig-meta-item ts-xxs-r" style="font-family:var(--font-family-mono)">→ ${esc(c.targetImportPath)}</div>
     </div>
-    ${bodyContent ? `<div class="mig-card-body ${migOpen ? 'open' : ''}">${bodyContent}</div>` : ''}
+    ${bodyContent ? `<div class="mig-card-body ${migOpen ? 'open' : ''}" onclick="event.stopPropagation()">${bodyContent}</div>` : ''}
   </div>`;
 }
 
@@ -691,7 +700,7 @@ function render() {
   html += `<div class="tab-content ${activeTab==='metrics'?'active':''}">${renderMetrics()}</div>`;
   if (CFG.componentAnalysisEnabled) {
     html += `<div class="tab-content ${activeTab==='tokens'?'active':''}">${renderTokens()}</div>`;
-    html += `<div class="tab-content ${activeTab==='api'?'active':''}">${renderApiRework()}</div>`;
+    if (CFG.apiRedesignTabEnabled) html += `<div class="tab-content ${activeTab==='api'?'active':''}">${renderApiRework()}</div>`;
   }
   if (CFG.migrationEnabled) html += `<div class="tab-content ${activeTab==='migration'?'active':''}">${renderMigration()}</div>`;
   if (CFG.roadmapEnabled) html += `<div class="tab-content ${activeTab==='roadmap'?'active':''}">${renderRoadmap()}</div>`;
@@ -722,8 +731,6 @@ function toggleMigDetail(src) { if (openMigDetails.has(src)) openMigDetails.dele
 function togglePhaseCard(id) { if (openPhaseCards.has(id)) openPhaseCards.delete(id); else openPhaseCards.add(id); render(); }
 
 function showDetail(filePath) {
-  if (detailFile === filePath) return;
-  detailFile = filePath;
   const file = report.files.find(f => f.path === filePath);
   if (!file) return;
   const allV = [];
@@ -734,7 +741,14 @@ function showDetail(filePath) {
   allV.sort((a, b) => a.line - b.line);
   const panel = document.getElementById('detail-panel');
   panel.className = 'detail-panel open';
-  panel.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-16)"><h3 class="ts-d-m" style="font-family:var(--font-family-mono)">${file.path}</h3><button class="detail-close ts-xxs-m" onclick="closeDetail()">Close</button></div><div class="violation-list">${allV.map(v => { const c = CATS[v.cat]?.color || 'var(--color-info)'; return `<div class="violation-item"><span class="violation-line ts-xxs-r">L${v.line}</span><span class="violation-match ts-xxs-m" style="color:${c}">${v.match}</span><span class="violation-context ts-xxs-r">${esc(v.context)}</span></div>`; }).join('')}</div>`;
+  const projectRoot = report.projectRoot || '';
+  const lineLink = (path, line) => {
+    if (!projectRoot) return `L${line}`;
+    const fullPath = (projectRoot + '/' + path).replace(/\\/g, '/');
+    const uri = 'cursor://file/' + encodeURI(fullPath) + ':' + line;
+    return `<a href="${uri}" title="Open in editor" class="ts-xxs-r">L${line}</a>`;
+  };
+  panel.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-16)"><h3 class="ts-d-m" style="font-family:var(--font-family-mono)">${file.path}</h3><button class="detail-close ts-xxs-m" onclick="closeDetail()">Close</button></div><div class="violation-list">${allV.map(v => { const catColor = CATS[v.cat]?.color || 'var(--color-info)'; return `<div class="violation-accordion-item open"><div class="violation-accordion-header"><span class="violation-line ts-xxs-r">${lineLink(file.path, v.line)}</span><span class="violation-match ts-xxs-m" style="color:${catColor}">${v.match}</span></div><div class="violation-accordion-body"><span class="violation-context ts-xxs-r">${esc(v.context)}</span></div></div>`; }).join('')}</div>`;
   panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 function closeDetail() { detailFile = null; render(); }
