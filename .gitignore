@@ -3,3 +3,7 @@ dist/
 *.tgz
 ds-coverage-report.json
 ds-coverage-dashboard.html
+ds-coverage.config.mjs
+.agents/
+.claude/
+.cursor/

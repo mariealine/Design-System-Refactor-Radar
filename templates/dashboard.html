@@ -117,8 +117,15 @@
     .search-input:focus { border-color: var(--color-accent); }
     .sort-select { padding: var(--space-8) var(--space-12); border: 1px solid var(--border-default); border-radius: var(--radius-8); font-family: var(--font-family); background: var(--bg-base-primary); cursor: pointer; }
 
-    /* File table */
-    .file-table-container { background: var(--bg-base-primary); border: 1px solid var(--border-default); border-radius: var(--radius-12); overflow: hidden; }
+    /* File table / Metrics file cards */
+    .file-table-container { background: transparent; }
+    .metrics-file-card { background: var(--bg-base-primary); border: 1px solid var(--border-default); border-radius: var(--radius-12); padding: var(--space-24); margin-bottom: var(--space-12); transition: border-color 0.15s; }
+    .metrics-file-card:hover { border-color: var(--border-hover); }
+    .metrics-file-card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-16); cursor: pointer; user-select: none; }
+    .metrics-file-card-header .metrics-file-card-left { flex: 1; min-width: 0; text-align: left; }
+    .metrics-file-card-header .metrics-file-card-right { display: flex; align-items: center; gap: var(--space-12); flex-shrink: 0; }
+    .metrics-file-card-body { display: none; margin-top: var(--space-16); text-align: left; }
+    .metrics-file-card-body.open { display: block; }
     .file-table { width: 100%; border-collapse: collapse; }
     .file-table th { text-align: left; padding: 10px var(--space-16); color: var(--text-secondary); background: var(--bg-base-primary-hover); border-bottom: 1px solid var(--border-default); cursor: pointer; user-select: none; text-transform: uppercase; letter-spacing: 0.05em; }
     .file-table th:hover { color: var(--text-main); }
@@ -135,11 +142,14 @@
     .detail-panel.open { display: block; }
     .detail-close { background: none; border: 1px solid var(--border-default); border-radius: var(--radius-8); padding: var(--space-4) 10px; cursor: pointer; font-family: var(--font-family); }
     .violation-list { font-family: var(--font-family-mono); line-height: 1.8; }
-    .violation-item { display: flex; gap: var(--space-12); padding: var(--space-4) var(--space-8); border-radius: var(--radius-4); }
+    .violation-item { display: flex; align-items: flex-start; gap: var(--space-12); padding: var(--space-8) var(--space-12); border-radius: var(--radius-6); }
     .violation-item:hover { background: var(--bg-base-primary-hover); }
-    .violation-line { color: var(--text-tertiary); min-width: 50px; text-align: right; }
-    .violation-match { color: var(--color-danger); font-weight: var(--font-weight-semibold); min-width: 160px; }
-    .violation-context { color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .violation-tag { display: inline-flex; align-items: center; gap: var(--space-6); padding: var(--space-2) var(--space-10); border-radius: var(--radius-6); font-weight: var(--font-weight-medium); flex-shrink: 0; }
+    .violation-tag .violation-tag-line a { color: inherit; text-decoration: none; opacity: 0.9; }
+    .violation-tag .violation-tag-line a:hover { text-decoration: underline; opacity: 1; }
+    .violation-content { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-2); }
+    .violation-match { font-weight: var(--font-weight-semibold); word-break: break-all; }
+    .violation-context { color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.9em; }
 
     /* Pagination */
     .pagination { display: flex; justify-content: space-between; align-items: center; padding: var(--space-12) var(--space-16); color: var(--text-secondary); background: var(--bg-base-primary-hover); border-top: 1px solid var(--border-default); }
@@ -156,7 +166,9 @@
 
     /* Roadmap */
     .phase-card { background: var(--bg-base-primary); border: 1px solid var(--border-default); border-radius: var(--radius-12); padding: var(--space-24); margin-bottom: var(--space-16); }
-    .phase-header { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-16); margin-bottom: var(--space-12); }
+    .phase-header { display: flex; justify-content: space-between; align-items: center; gap: var(--space-16); cursor: pointer; user-select: none; }
+    .phase-card-body { display: none; margin-top: var(--space-16); }
+    .phase-card-body.open { display: block; }
     .phase-title { display: flex; align-items: center; gap: var(--space-8); }
     .phase-number { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: var(--color-accent); color: var(--text-complementary); flex-shrink: 0; }
     .phase-desc { color: var(--text-secondary); margin-bottom: var(--space-16); }
@@ -174,21 +186,28 @@
     .phase-file-count { color: var(--text-secondary); flex-shrink: 0; }
     .biz-case { background: var(--bg-base-primary-hover); border-radius: var(--radius-8); padding: var(--space-12) var(--space-16); margin-bottom: var(--space-16); border-left: 3px solid var(--color-accent); }
     .dir-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: var(--space-12); margin-bottom: var(--space-24); }
-    .dir-card { background: var(--bg-base-primary); border: 1px solid var(--border-default); border-radius: var(--radius-8); padding: var(--space-16); }
+    .dir-card { background: var(--bg-base-primary); border: 1px solid var(--border-default); border-radius: var(--radius-12); padding: var(--space-20); }
     .dir-bar { display: flex; height: var(--space-6); border-radius: var(--space-4); overflow: hidden; background: var(--bg-base-secondary); margin-bottom: var(--space-6); }
     .dir-bar-fill { height: 100%; transition: width 0.3s; }
     .dir-stats { display: flex; justify-content: space-between; color: var(--text-secondary); }
 
     /* Token table */
-    .token-table { width: 100%; border-collapse: collapse; background: var(--bg-base-primary); border: 1px solid var(--border-default); border-radius: var(--radius-12); overflow: hidden; }
-    .token-table th { text-align: left; padding: 10px var(--space-16); color: var(--text-secondary); background: var(--bg-base-primary-hover); border-bottom: 1px solid var(--border-default); text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
-    .token-table td { padding: var(--space-8) var(--space-16); border-bottom: 1px solid var(--border-default); vertical-align: middle; }
-    .token-table tr:last-child td { border-bottom: none; }
-    .token-table tr:hover td { background: var(--bg-base-primary-hover); }
-    .token-score-bar { display: flex; align-items: center; gap: var(--space-8); min-width: 140px; }
+    .token-card { background: var(--bg-base-primary); border: 1px solid var(--border-default); border-radius: var(--radius-12); padding: var(--space-24); margin-bottom: var(--space-12); transition: border-color 0.15s; }
+    .token-card:hover { border-color: var(--border-hover); }
+    .token-card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-16); cursor: pointer; user-select: none; }
+    .token-card-header .token-card-left { flex: 1; min-width: 0; text-align: left; }
+    .token-card-header .token-card-right { display: flex; align-items: center; gap: var(--space-12); flex-shrink: 0; }
+    .token-card-body { display: none; margin-top: var(--space-16); text-align: left; }
+    .token-card-body.open { display: block; }
+    .token-score-bar { display: flex; align-items: center; gap: var(--space-8); min-width: 100px; }
     .token-bar-track { flex: 1; height: var(--space-6); border-radius: var(--space-4); background: var(--bg-base-secondary); overflow: hidden; }
     .token-bar-fill { height: 100%; border-radius: var(--space-4); transition: width 0.3s; }
     .token-score-pct { min-width: 44px; text-align: right; font-weight: var(--font-weight-semibold); }
+    .token-violation-list { font-family: var(--font-family-mono); line-height: 1.8; margin-top: var(--space-12); }
+    .token-violation-item { display: flex; align-items: flex-start; gap: var(--space-12); padding: var(--space-8) var(--space-12); border-radius: var(--radius-6); }
+    .token-violation-item:hover { background: var(--bg-base-primary-hover); }
+    .token-violation-item .violation-tag { display: inline-flex; align-items: center; gap: var(--space-6); padding: var(--space-2) var(--space-10); border-radius: var(--radius-6); font-weight: var(--font-weight-medium); flex-shrink: 0; }
+    .token-violation-item .violation-content { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-2); }
 
     /* API Rework */
     .api-stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: var(--space-12); align-content: center; }
@@ -201,7 +220,7 @@
     .api-loc-btn { padding: var(--space-6) var(--space-16); border: 1px solid var(--border-default); border-radius: var(--radius-8); background: var(--bg-base-primary); cursor: pointer; font-family: var(--font-family); transition: all 0.15s; }
     .api-loc-btn:hover { border-color: var(--color-accent); }
     .api-loc-btn.active { background: var(--color-accent); color: var(--text-complementary); border-color: var(--color-accent); }
-    .comp-card { background: var(--bg-base-primary); border: 1px solid var(--border-default); border-radius: var(--radius-8); padding: var(--space-16); margin-bottom: var(--space-8); display: grid; grid-template-columns: 1fr auto; gap: var(--space-16); align-items: start; }
+    .comp-card { background: var(--bg-base-primary); border: 1px solid var(--border-default); border-radius: var(--radius-12); padding: var(--space-24); margin-bottom: var(--space-12); display: grid; grid-template-columns: 1fr auto; gap: var(--space-16); align-items: start; }
     .comp-card:hover { border-color: var(--border-hover); }
     .comp-features { display: flex; gap: var(--space-6); flex-wrap: wrap; margin-top: var(--space-8); }
     .comp-feature { padding: var(--space-2) var(--space-8); border-radius: var(--radius-4); display: inline-flex; align-items: center; gap: var(--space-4); }
@@ -222,6 +241,7 @@
 
     /* Migration */
     .mig-section { margin-bottom: var(--space-32); }
+    .mig-legacy-card .mig-legacy-title { font-size: var(--text-size-default); font-weight: var(--font-weight-semibold); color: var(--text-main); }
     .mig-section-header { display: flex; align-items: center; gap: var(--space-12); margin-bottom: var(--space-16); padding-bottom: var(--space-8); border-bottom: 2px solid var(--border-default); }
     .mig-section-badge { display: inline-flex; align-items: center; justify-content: center; padding: var(--space-4) var(--space-12); border-radius: var(--radius-6); font-weight: var(--font-weight-semibold); }
     .mig-section-badge.simple { background: oklch(0.982 0.018 155.826); color: oklch(0.527 0.154 150.069); }
@@ -229,7 +249,9 @@
     .mig-section-badge.complex { background: oklch(0.971 0.013 17.38); color: oklch(0.505 0.213 27.518); }
     .mig-card { background: var(--bg-base-primary); border: 1px solid var(--border-default); border-radius: var(--radius-12); padding: var(--space-24); margin-bottom: var(--space-12); transition: border-color 0.15s; }
     .mig-card:hover { border-color: var(--border-hover); }
-    .mig-card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-16); margin-bottom: var(--space-12); }
+    .mig-card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-16); cursor: pointer; user-select: none; }
+    .mig-card-body { display: none; margin-top: var(--space-16); }
+    .mig-card-body.open { display: block; }
     .mig-swap { display: flex; align-items: center; gap: var(--space-8); }
     .mig-comp-name { font-weight: var(--font-weight-semibold); padding: var(--space-4) var(--space-12); border-radius: var(--radius-6); font-family: var(--font-family-mono); }
     .mig-comp-name.source { background: oklch(0.971 0.013 17.38); color: oklch(0.505 0.213 27.518); }
@@ -246,8 +268,7 @@
     .mig-breaking-item { display: flex; align-items: flex-start; gap: var(--space-6); padding: var(--space-2) 0; }
     .mig-files-toggle { background: none; border: none; color: var(--color-accent); cursor: pointer; font-family: var(--font-family); padding: 0; }
     .mig-files-toggle:hover { text-decoration: underline; }
-    .mig-file-list { display: none; margin-top: var(--space-8); }
-    .mig-file-list.open { display: block; }
+    .mig-file-list { margin-top: var(--space-8); }
     .mig-file-item { display: flex; justify-content: space-between; align-items: center; padding: var(--space-4) var(--space-8); border-radius: var(--radius-4); }
     .mig-file-item:hover { background: var(--bg-base-primary-hover); }
     .mig-file-path { font-family: var(--font-family-mono); color: var(--text-primary); }
@@ -334,6 +355,7 @@ let sortDir = 'desc';
 let currentPage = 0;
 const PAGE_SIZE = 50;
 let detailFile = null;
+const openMetricsFileDetails = new Set();
 const openPhases = new Set();
 let tokenLocationFilter = 'all';
 let tokenSearchQuery = '';
@@ -343,6 +365,7 @@ let apiLocationFilter = 'all';
 let apiFeatureFilter = null;
 let apiSearchQuery = '';
 const openCompDetails = new Set();
+const openTokenDetails = new Set();
 let migComplexityFilter = 'all';
 let migSearchQuery = '';
 let migShowFilter = 'toMigrate'; // 'toMigrate' | 'migrated' | 'all'
@@ -400,11 +423,54 @@ function getFilteredFiles() {
 function renderHeader() {
   const s = report.summary;
   const tabs = [{ id: 'metrics', label: 'Metrics — App' }];
-  if (CFG.componentAnalysisEnabled) tabs.push({ id: 'tokens', label: 'Metrics — Design System' });
+  if (CFG.componentAnalysisEnabled) {
+    tabs.push({ id: 'tokens', label: 'Metrics — Design System' });
+    if (CFG.apiRedesignTabEnabled) tabs.push({ id: 'api', label: 'Components — API Redesign' });
+  }
   if (CFG.migrationEnabled) tabs.push({ id: 'migration', label: 'Migration Plan' });
   if (CFG.roadmapEnabled) tabs.push({ id: 'roadmap', label: 'Refactoring Roadmap' });
   if (CFG.businessLogicAnalysisEnabled || CFG.purityEnabled) tabs.push({ id: 'refactor-radar', label: 'Refactor Radar' });
   return `<div class="header"><div><h1>${esc(CFG.title)}</h1><div class="subtitle ts-d-r">${esc(CFG.subtitle)}</div></div><div><span class="timestamp ts-xxs-r">Generated: ${new Date(report.generatedAt).toLocaleString()}</span></div></div><div class="tab-bar">${tabs.map(t => `<button class="tab-btn ts-d-m ${activeTab === t.id ? 'active' : ''}" onclick="switchTab('${t.id}')">${t.label}</button>`).join('')}</div>`;
+}
+
+function renderMetricsFileCard(f) {
+  const isOpen = openMetricsFileDetails.has(f.path);
+  const pathEsc = f.path.replace(/'/g, "\\'");
+
+  const allV = [];
+  for (const [key, vs] of Object.entries(f.violations || {})) { for (const v of vs) allV.push({ ...v, cat: key }); }
+  for (const v of (f.flags?.migrateSimple || [])) allV.push({ ...v, cat: 'flag-simple' });
+  for (const v of (f.flags?.migrateComplex || [])) allV.push({ ...v, cat: 'flag-complex' });
+  for (const v of (f.flags?.todo || [])) allV.push({ ...v, cat: 'flag-todo' });
+  allV.sort((a, b) => a.line - b.line);
+
+  const projectRoot = report.projectRoot || '';
+  const lineLink = (path, line) => {
+    if (!projectRoot) return `L${line}`;
+    const fullPath = (projectRoot + '/' + path).replace(/\\/g, '/');
+    return `<a href="cursor://file/${encodeURI(fullPath)}:${line}" title="Open in Cursor" class="ts-xxs-r" style="color:var(--color-accent);text-decoration:none">L${line}</a>`;
+  };
+
+  const catLabel = (cat) => CATS[cat]?.label || (cat === 'flag-simple' ? '@ds-migrate: simple' : cat === 'flag-complex' ? '@ds-migrate: complex' : cat === 'flag-todo' ? '@ds-todo' : cat);
+  const violationsBody = allV.length > 0
+    ? `<div class="violation-list">${allV.map(v => { const c = CATS[v.cat]?.color || 'var(--color-info)'; return `<div class="violation-item"><span class="violation-tag ts-xxs-m" style="background:var(--bg-base-secondary);border-left:3px solid ${c}"><span class="violation-tag-line" style="color:var(--text-tertiary)">${lineLink(f.path, v.line)}</span><span class="violation-tag-sep" style="color:var(--text-tertiary)">·</span><span class="violation-tag-label" style="color:${c}">${esc(catLabel(v.cat))}</span></span><div class="violation-content"><span class="violation-match ts-xxs-m" style="color:${c}">${esc(v.match)}</span><span class="violation-context ts-xxs-r">${esc(v.context)}</span></div></div>`; }).join('')}</div>`
+    : '<div class="ts-xs-r" style="color:var(--text-secondary)">No violations in this file.</div>';
+
+  return `<div class="metrics-file-card">
+    <div class="metrics-file-card-header" onclick="toggleMetricsFileDetail('${pathEsc}')">
+      <div class="metrics-file-card-left">
+        <div class="ts-d-m" style="font-weight:var(--font-weight-semibold);font-family:var(--font-family-mono)">${esc(f.path)}</div>
+      </div>
+      <div class="metrics-file-card-right">
+        <span title="Total violations">${f.totalViolations > 0 ? `<strong class="ts-xs-m" style="color:var(--color-danger)">${f.totalViolations}</strong>` : '<span style="color:var(--color-success)" class="ts-xs-m">✓</span>'}</span>
+        ${CAT_KEYS.map(k => `<span title="${esc(CATS[k]?.label || k)}">${renderBadge(f.violations[k]?.length || 0, k)}</span>`).join('')}
+        <span title="Flags">${f.totalFlags > 0 ? `<span class="badge ts-xxs-m" style="background:oklch(0.982 0.022 70.08);color:oklch(0.393 0.095 70.08)">${f.totalFlags}</span>` : renderBadge(0, '')}</span>
+      </div>
+    </div>
+    <div class="metrics-file-card-body ${isOpen ? 'open' : ''}">
+      ${violationsBody}
+    </div>
+  </div>`;
 }
 
 function renderMetrics() {
@@ -432,10 +498,58 @@ function renderMetrics() {
   </div>
   <div class="toolbar"><input class="search-input ts-xs-r" type="text" placeholder="Filter by file path..." value="${searchQuery}" oninput="onSearch(this.value)" />
   <select class="sort-select ts-xs-r" onchange="onSort(this.value)"><option value="totalViolations-desc" ${sortField==='totalViolations'&&sortDir==='desc'?'selected':''}>Most violations</option><option value="totalViolations-asc" ${sortField==='totalViolations'&&sortDir==='asc'?'selected':''}>Least violations</option><option value="path-asc" ${sortField==='path'&&sortDir==='asc'?'selected':''}>Name A-Z</option>${CAT_KEYS.map(k=>`<option value="${k}-desc">${CATS[k].label} ↓</option>`).join('')}</select></div>
-  <div class="file-table-container"><table class="file-table"><thead><tr><th class="ts-xxs-m" style="width:45%">File</th><th class="ts-xxs-m">Total</th>${CAT_KEYS.map(k=>`<th class="ts-xxs-m">${CATS[k].label.slice(0,6)}</th>`).join('')}<th class="ts-xxs-m">Flags</th></tr></thead><tbody>
-  ${pageFiles.length === 0 ? `<tr><td colspan="${CAT_KEYS.length + 3}" class="empty-state ts-d-r">No files match.</td></tr>` : pageFiles.map(f => `<tr onclick="showDetail('${f.path.replace(/'/g,"\\'")}')" style="cursor:pointer"><td><span class="file-path ts-xxs-r">${f.path}</span></td><td><strong class="ts-xs-m">${f.totalViolations}</strong></td>${CAT_KEYS.map(k=>`<td>${renderBadge(f.violations[k]?.length||0,k)}</td>`).join('')}<td>${f.totalFlags > 0 ? `<span class="badge ts-xxs-m" style="background:oklch(0.982 0.022 70.08);color:oklch(0.393 0.095 70.08)">${f.totalFlags}</span>` : renderBadge(0,'')}</td></tr>`).join('')}
-  </tbody></table>${totalPages > 1 ? `<div class="pagination"><span class="ts-xxs-r">Showing ${currentPage*PAGE_SIZE+1}–${Math.min((currentPage+1)*PAGE_SIZE,files.length)} of ${files.length}</span><div style="display:flex;gap:var(--space-8)"><button class="ts-xxs-m" onclick="goPage(${currentPage-1})" ${currentPage===0?'disabled':''}>← Previous</button><button class="ts-xxs-m" onclick="goPage(${currentPage+1})" ${currentPage>=totalPages-1?'disabled':''}>Next →</button></div></div>` : ''}</div>
-  <div id="detail-panel" class="detail-panel"></div>`;
+  <div class="metrics-badge-legend ts-xxs-m" style="display:flex;align-items:center;gap:var(--space-12);flex-wrap:wrap;color:var(--text-tertiary);margin-bottom:var(--space-12)"><span>Total</span>${CAT_KEYS.map(k=>`<span>${CATS[k]?.label || k}</span>`).join('')}<span>Flags</span></div>
+  <div class="file-table-container">
+  ${pageFiles.length === 0 ? '<div class="empty-state ts-d-r">No files match.</div>' : pageFiles.map(f => renderMetricsFileCard(f)).join('')}
+  ${totalPages > 1 ? `<div class="pagination" style="margin-top:var(--space-16);border-top:1px solid var(--border-default);padding-top:var(--space-16)"><span class="ts-xxs-r">Showing ${currentPage*PAGE_SIZE+1}–${Math.min((currentPage+1)*PAGE_SIZE,files.length)} of ${files.length}</span><div style="display:flex;gap:var(--space-8)"><button class="ts-xxs-m" onclick="goPage(${currentPage-1})" ${currentPage===0?'disabled':''}>← Previous</button><button class="ts-xxs-m" onclick="goPage(${currentPage+1})" ${currentPage>=totalPages-1?'disabled':''}>Next →</button></div></div>` : ''}
+  </div>`;
+}
+
+function renderTokenCard(c) {
+  const tc = c.tokenCoverage;
+  const color = getCoverageColor(tc.score);
+  const sr = Math.round(tc.score);
+  const isOpen = openTokenDetails.has(c.path);
+  const pathEsc = c.path.replace(/'/g, "\\'");
+
+  const file = report.files && report.files.find(f => f.path === c.path);
+  let violationsBody = '';
+  if (file && (file.totalViolations > 0 || (file.flags && (file.flags.migrateSimple?.length || file.flags.migrateComplex?.length || file.flags.todo?.length)))) {
+    const allV = [];
+    for (const [key, vs] of Object.entries(file.violations || {})) { for (const v of vs) allV.push({ ...v, cat: key }); }
+    if (file.flags) { for (const v of (file.flags.migrateSimple || [])) allV.push({ ...v, cat: 'flag-simple' }); for (const v of (file.flags.migrateComplex || [])) allV.push({ ...v, cat: 'flag-complex' }); for (const v of (file.flags.todo || [])) allV.push({ ...v, cat: 'flag-todo' }); }
+    allV.sort((a, b) => a.line - b.line);
+    const projectRoot = report.projectRoot || '';
+    const lineLink = (path, line) => {
+      if (!projectRoot) return `L${line}`;
+      const fullPath = (projectRoot + '/' + path).replace(/\\/g, '/');
+      return `<a href="cursor://file/${encodeURI(fullPath)}:${line}" title="Open in Cursor" class="ts-xxs-r" style="color:var(--color-accent);text-decoration:none">L${line}</a>`;
+    };
+    const catLabel = (cat) => CATS[cat]?.label || (cat === 'flag-simple' ? '@ds-migrate: simple' : cat === 'flag-complex' ? '@ds-migrate: complex' : cat === 'flag-todo' ? '@ds-todo' : cat);
+    violationsBody = `<div class="token-violation-list"><div class="ts-xxs-m" style="color:var(--text-secondary);margin-bottom:var(--space-8)">Violations</div>${allV.map(v => { const catColor = CATS[v.cat]?.color || 'var(--color-info)'; return `<div class="token-violation-item"><span class="violation-tag ts-xxs-m" style="background:var(--bg-base-secondary);border-left:3px solid ${catColor}"><span class="violation-tag-line" style="color:var(--text-tertiary)">${lineLink(file.path, v.line)}</span><span class="violation-tag-sep" style="color:var(--text-tertiary)">·</span><span class="violation-tag-label" style="color:${catColor}">${esc(catLabel(v.cat))}</span></span><div class="violation-content"><span class="ts-xxs-m violation-match" style="color:${catColor}">${esc(v.match)}</span><span class="ts-xxs-r" style="color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(v.context)}</span></div></div>`; }).join('')}</div>`;
+  } else if (tc.totalViolations === 0) {
+    violationsBody = '<div class="ts-xs-r" style="color:var(--color-success)">✓ No violations</div>';
+  } else {
+    violationsBody = '<div class="ts-xs-r" style="color:var(--text-secondary)">No violation details available for this file.</div>';
+  }
+
+  return `<div class="token-card">
+    <div class="token-card-header" onclick="toggleTokenDetail('${pathEsc}')">
+      <div class="token-card-left">
+        <div class="ts-d-m" style="font-weight:var(--font-weight-semibold)">${esc(c.name)}</div>
+        <div class="ts-xxs-r" style="color:var(--text-tertiary);font-family:var(--font-family-mono);margin-top:var(--space-2)">${esc(c.path)}</div>
+      </div>
+      <div class="token-card-right">
+        <span class="loc-badge ${c.location} ts-xxs-m">${c.location}/</span>
+        <div class="token-score-bar"><div class="token-bar-track"><div class="token-bar-fill" style="width:${sr}%;background:${color}"></div></div><span class="token-score-pct ts-xs-m" style="color:${color}">${sr}%</span></div>
+        ${tc.totalViolations > 0 ? `<strong class="ts-xs-m" style="color:var(--color-danger)">${tc.totalViolations}</strong>` : '<span style="color:var(--color-success)" class="ts-xs-m">✓</span>'}
+        ${CAT_KEYS.filter(k => (tc.violations[k] || 0) > 0).map(k => renderBadge(tc.violations[k], k)).join('')}
+      </div>
+    </div>
+    <div class="token-card-body ${isOpen ? 'open' : ''}">
+      ${violationsBody}
+    </div>
+  </div>`;
 }
 
 function renderTokens() {
@@ -460,12 +574,14 @@ function renderTokens() {
   <div class="toolbar">
     <button class="api-loc-btn ts-xs-m ${tokenLocationFilter==='all'?'active':''}" onclick="setTokenFilter('all')">All (${s.totalComponents})</button>
     ${locations.map(l => `<button class="api-loc-btn ts-xs-m ${tokenLocationFilter===l?'active':''}" onclick="setTokenFilter('${l}')">${l}/ (${s.byLocation[l]})</button>`).join('')}
-    <input class="search-input ts-xs-r" type="text" placeholder="Search component..." value="${tokenSearchQuery}" oninput="onTokenSearch(this.value)" />
+    <span style="width:1px;height:20px;background:var(--border-default);margin:0 var(--space-4)"></span>
+    <span class="ts-xxs-m" style="color:var(--text-secondary)">Sort:</span>
+    <button class="api-loc-btn ts-xs-m ${tokenSortField==='name'?'active':''}" onclick="onTokenSort('name')">Name${sortI('name')}</button>
+    <button class="api-loc-btn ts-xs-m ${tokenSortField==='score'?'active':''}" onclick="onTokenSort('score')">Score${sortI('score')}</button>
+    <button class="api-loc-btn ts-xs-m ${tokenSortField==='violations'?'active':''}" onclick="onTokenSort('violations')">Violations${sortI('violations')}</button>
+    <input class="search-input ts-xs-r" type="text" placeholder="Search component..." value="${tokenSearchQuery}" oninput="onTokenSearch(this.value)" style="margin-left:auto" />
   </div>
-  <table class="token-table"><thead><tr><th class="ts-xxs-m" style="width:60px">Loc</th><th class="ts-xxs-m" style="cursor:pointer" onclick="onTokenSort('name')">Component${sortI('name')}</th><th class="ts-xxs-m" style="min-width:160px;cursor:pointer" onclick="onTokenSort('score')">Token Score${sortI('score')}</th><th class="ts-xxs-m" style="text-align:center;cursor:pointer" onclick="onTokenSort('violations')">Total${sortI('violations')}</th>${CAT_KEYS.map(k=>`<th class="ts-xxs-m" style="text-align:center;cursor:pointer" onclick="onTokenSort('${k}')">${CATS[k].label.slice(0,6)}${sortI(k)}</th>`).join('')}</tr></thead><tbody>
-  ${components.map(c => { const tc = c.tokenCoverage; const color = getCoverageColor(tc.score); const sr = Math.round(tc.score);
-    return `<tr><td><span class="loc-badge ${c.location} ts-xxs-m">${c.location}/</span></td><td><div class="ts-xs-m" style="font-weight:var(--font-weight-semibold)">${c.name}</div><div class="ts-xxs-r" style="color:var(--text-tertiary);font-family:var(--font-family-mono)">${c.path}</div></td><td><div class="token-score-bar"><div class="token-bar-track"><div class="token-bar-fill" style="width:${sr}%;background:${color}"></div></div><span class="token-score-pct ts-xs-m" style="color:${color}">${sr}%</span></div></td><td style="text-align:center">${tc.totalViolations > 0 ? `<strong class="ts-xs-m">${tc.totalViolations}</strong>` : '<span style="color:var(--color-success)" class="ts-xs-m">✓</span>'}</td>${CAT_KEYS.map(k=>`<td style="text-align:center">${renderBadge(tc.violations[k]||0,k)}</td>`).join('')}</tr>`; }).join('') || `<tr><td colspan="${CAT_KEYS.length+4}" class="empty-state ts-d-r">No components match.</td></tr>`}
-  </tbody></table>`;
+  <div class="token-cards">${components.length === 0 ? '<div class="empty-state ts-d-r">No components match.</div>' : components.map(c => renderTokenCard(c)).join('')}</div>`;
 }
 
 function renderApiRework() {
@@ -507,7 +623,8 @@ function renderRoadmap() {
   const r = report.roadmap;
   if (!r) return '<div class="empty-state ts-d-r">No roadmap data.</div>';
   const phasesHtml = r.phases.map((p, i) => { const isOpen = openPhases.has(p.id);
-    return `<div class="phase-card"><div class="phase-header"><div class="phase-title"><span class="phase-number ts-xxs-m">${i+1}</span><span class="ts-l-m">${p.title}</span></div></div><div class="phase-desc ts-xs-r">${p.description}</div>${p.businessCase?`<div class="biz-case"><div class="ts-xxs-m" style="color:var(--text-secondary);margin-bottom:var(--space-4);text-transform:uppercase;letter-spacing:0.05em">Why prioritize</div><div class="ts-xs-r" style="color:var(--text-primary)">${p.businessCase}</div></div>`:''}<div class="phase-stats"><div><span class="phase-stat-value ts-d-m">${p.filesCount}</span><span class="phase-stat-label ts-xxs-r"> files</span></div><div><span class="phase-stat-value ts-d-m">${p.violationsCount}</span><span class="phase-stat-label ts-xxs-r"> violations</span></div></div><div class="phase-files"><button class="phase-files-toggle ts-xs-m" onclick="togglePhaseFiles('${p.id}')">${isOpen?'▾ Hide files':'▸ Show files'} (${p.files.length})</button><div class="phase-file-list ${isOpen?'open':''}">${p.files.map(f=>`<div class="phase-file-item"><span class="phase-file-path ts-xxs-r">${f.path}</span><span class="phase-file-count ts-xxs-m">${f.count}</span></div>`).join('')}</div></div></div>`; }).join('');
+    const pid = String(p.id).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    return `<div class="phase-card"><div class="phase-header" onclick="togglePhaseFiles('${pid}')"><div class="phase-title"><span class="phase-number ts-xxs-m">${i+1}</span><span class="ts-l-m">${esc(p.title)}</span></div><div class="phase-stats" style="margin:0"><span class="phase-stat-value ts-d-m">${p.filesCount}</span><span class="phase-stat-label ts-xxs-r"> files</span> · <span class="phase-stat-value ts-d-m">${p.violationsCount}</span><span class="phase-stat-label ts-xxs-r"> violations</span></div></div><div class="phase-card-body ${isOpen?'open':''}"><div class="phase-desc ts-xs-r">${esc(p.description)}</div>${p.businessCase?`<div class="biz-case"><div class="ts-xxs-m" style="color:var(--text-secondary);margin-bottom:var(--space-4);text-transform:uppercase;letter-spacing:0.05em">Why prioritize</div><div class="ts-xs-r" style="color:var(--text-primary)">${esc(p.businessCase)}</div></div>`:''}<div class="phase-stats"><div><span class="phase-stat-value ts-d-m">${p.filesCount}</span><span class="phase-stat-label ts-xxs-r"> files</span></div><div><span class="phase-stat-value ts-d-m">${p.violationsCount}</span><span class="phase-stat-label ts-xxs-r"> violations</span></div></div><div class="phase-files"><div class="ts-xxs-m" style="color:var(--text-secondary);margin-bottom:var(--space-8)">📄 Fichiers concernés (${p.files.length})</div><div class="phase-file-list open">${p.files.map(f=>`<div class="phase-file-item"><span class="phase-file-path ts-xxs-r">${esc(f.path)}</span><span class="phase-file-count ts-xxs-m">${f.count}</span></div>`).join('')}</div></div></div></div>`; }).join('');
   const topDirs = r.directories.slice(0, 15);
   const dirHtml = topDirs.map(d => `<div class="dir-card"><div class="ts-xxs-m" style="font-family:var(--font-family-mono);margin-bottom:var(--space-8);word-break:break-all">${d.path}/</div><div class="dir-bar"><div class="dir-bar-fill" style="width:${d.coveragePercent}%;background:${getCoverageColor(d.coveragePercent)}"></div></div><div class="dir-stats ts-xxs-r"><span>${d.coveragePercent}% compliant</span><span>${d.filesWithViolations}/${d.totalFiles} with debt</span><span>${d.totalViolations} violations</span></div></div>`).join('');
   return `<h2 class="ts-xl-sb" style="margin-bottom:var(--space-8)">Refactoring Roadmap</h2><p class="ts-d-r" style="color:var(--text-secondary);margin-bottom:var(--space-24)">Migration phases ordered by impact. Each includes a business case and affected files.</p>${phasesHtml}<h2 class="ts-xl-sb" style="margin-top:var(--space-32);margin-bottom:var(--space-8)">Coverage by Directory</h2><p class="ts-d-r" style="color:var(--text-secondary);margin-bottom:var(--space-16)">Directories sorted by most violations.</p><div class="dir-grid">${dirHtml}</div>`;
@@ -518,9 +635,9 @@ function renderMigration() {
     return '<div class="empty-state"><div class="icon">🔄</div><h2 class="ts-xl-sb">Migration Plan Disabled</h2><p class="ts-d-r" style="margin-top:var(--space-8)">Enable migration in your config:<br/><code style="background:var(--bg-base-secondary);padding:var(--space-4) var(--space-8);border-radius:var(--radius-4);margin-top:var(--space-8);display:inline-block">migration: { enabled: true, mappings: [...] }</code></p></div>';
   }
   const mig = report.migration;
-  if (!mig) return '<div class="empty-state"><div class="icon">🔄</div><h2 class="ts-xl-sb">No migration plan</h2><p class="ts-d-r" style="margin-top:var(--space-8)">Configure the <code>migration</code> section in your ds-coverage config</p></div>';
+  if (!mig) return '<div class="empty-state"><div class="icon">🔄</div><h2 class="ts-xl-sb">No migration plan</h2><p class="ts-d-r" style="margin-top:var(--space-8);color:var(--text-secondary)">Enable <code>migration.enabled</code> and add <code>migration.mappings</code> in your ds-coverage config, then run the scan again.</p></div>';
   const ms = mig.summary;
-  if (ms.totalMappings === 0) return '<div class="empty-state"><div class="icon">✅</div><h2 class="ts-xl-sb">No components to migrate</h2></div>';
+  if (ms.totalMappings === 0) return '<div class="empty-state"><div class="icon">📋</div><h2 class="ts-xl-sb">No component mappings yet</h2><p class="ts-d-r" style="margin-top:var(--space-8);color:var(--text-secondary)">Add entries to <code>migration.mappings</code> in your config to track migration from your current library to the target.</p></div>';
 
   // Support older reports without totalToMigrate/totalMigrated/migrated
   const totalToMigrate = ms.totalToMigrate ?? ms.totalMappings;
@@ -534,20 +651,33 @@ function renderMigration() {
   if (migComplexityFilter !== 'all') components = components.filter(c => c.complexity === migComplexityFilter);
   if (migSearchQuery) { const q = migSearchQuery.toLowerCase(); components = components.filter(c => c.source.toLowerCase().includes(q) || c.target.toLowerCase().includes(q)); }
 
-  // Legacy HTML block (hardcoded <input>, <textarea>, etc.)
+  // Legacy HTML block — same card style as migration cards: collapsible, closed by default, details on click
   let legacyHtmlBlock = '';
   if (mig.legacyHtml && mig.legacyHtml.totalElements > 0) {
     const lh = mig.legacyHtml;
     const byEl = Object.entries(lh.byElement).filter(([, c]) => c.usages > 0).sort((a, b) => b[1].usages - a[1].usages);
-    legacyHtmlBlock = `<div class="legacy-html-block" style="margin-bottom:var(--space-24);padding:var(--space-16);background:var(--surface-raised);border:1px solid var(--border-default);border-radius:var(--radius-m);">
-      <div class="ts-xs-m" style="margin-bottom:var(--space-8);color:var(--text-secondary)">📄 Legacy HTML elements</div>
-      <p class="ts-d-r" style="margin-bottom:var(--space-12)">Hardcoded native tags detected. Replace with design system components (see migration cards below).</p>
-      <div style="display:flex;flex-wrap:wrap;gap:var(--space-16);align-items:center;margin-bottom:var(--space-12)">
-        <div class="stat" style="min-width:80px"><div class="stat-value">${lh.totalElements}</div><div class="stat-label ts-xxs-m">Total</div></div>
-        <div class="stat" style="min-width:80px"><div class="stat-value">${lh.totalFiles}</div><div class="stat-label ts-xxs-m">Files</div></div>
-        ${byEl.map(([tag, c]) => `<span class="ts-xs-r" style="font-family:var(--font-family-mono)">&lt;${tag}&gt;</span> <span class="ts-xxs-m" style="color:var(--text-secondary)">${c.usages} (${c.files} files)</span>`).join('')}
+    const isLegacyOpen = openMigFiles.has('__legacy-html__');
+    const filesBody = lh.fileDetails.length > 0 ? `<div class="mig-files-section" style="border-top:1px solid var(--border-default);padding-top:var(--space-12)"><div class="ts-xxs-m" style="color:var(--text-secondary);margin-bottom:var(--space-8)">📄 Fichiers concernés (${lh.fileDetails.length})</div><ul class="mig-file-list" style="max-height:200px;overflow:auto">${lh.fileDetails.slice(0, 30).map(f => `<li class="mig-file-item"><span class="mig-file-path ts-xxs-r">${esc(f.path)}</span><span class="ts-xxs-m">${f.total} element${f.total > 1 ? 's' : ''}</span> ${Object.entries(f.byElement).map(([tag, n]) => `<span class="ts-xxs-r" style="color:var(--text-secondary)">&lt;${tag}&gt;: ${n}</span>`).join(' ')}</li>`).join('')}</ul>${lh.fileDetails.length > 30 ? `<p class="ts-xxs-r" style="color:var(--text-secondary);margin-top:var(--space-4)">… and ${lh.fileDetails.length - 30} more files</p>` : ''}</div>` : '';
+    legacyHtmlBlock = `<div class="mig-card mig-legacy-card">
+      <div class="mig-card-header" onclick="toggleMigFiles('__legacy-html__')">
+        <div style="display:flex;align-items:center;flex:1">
+          <div class="mig-legacy-title" style="margin:0">📄 Legacy HTML elements</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:var(--space-12);flex-wrap:wrap">
+          <span class="ts-xxs-r" style="color:var(--text-secondary)">${lh.totalElements} total</span>
+          <span class="ts-xxs-r" style="color:var(--text-secondary)">${lh.totalFiles} files</span>
+          ${byEl.map(([tag, c]) => `<span class="ts-xxs-m" style="font-family:var(--font-family-mono)">&lt;${tag}&gt;</span>`).join('')}
+        </div>
       </div>
-      ${lh.fileDetails.length > 0 ? `<details style="margin-top:var(--space-8)"><summary class="ts-xxs-m" style="cursor:pointer;color:var(--text-secondary)">▸ By file (${lh.fileDetails.length})</summary><ul class="mig-file-list" style="margin-top:var(--space-8);max-height:200px;overflow:auto">${lh.fileDetails.slice(0, 30).map(f => `<li class="mig-file-item"><span class="mig-file-path ts-xxs-r">${f.path}</span><span class="ts-xxs-m">${f.total} element${f.total > 1 ? 's' : ''}</span> ${Object.entries(f.byElement).map(([tag, n]) => `<span class="ts-xxs-r" style="color:var(--text-secondary)">&lt;${tag}&gt;: ${n}</span>`).join(' ')}</li>`).join('')}</ul>${lh.fileDetails.length > 30 ? `<p class="ts-xxs-r" style="color:var(--text-secondary);margin-top:var(--space-4)">… and ${lh.fileDetails.length - 30} more files</p>` : ''}</details>` : ''}
+      <div class="mig-card-body ${isLegacyOpen ? 'open' : ''}">
+        <p class="ts-d-r" style="color:var(--text-secondary);margin-bottom:var(--space-16)">Hardcoded native tags detected. Replace with design system components (see migration cards below).</p>
+        <div style="display:flex;flex-wrap:wrap;gap:var(--space-16);align-items:center;margin-bottom:var(--space-12)">
+          <div class="stat" style="min-width:80px"><div class="stat-value">${lh.totalElements}</div><div class="stat-label ts-xxs-m">Total</div></div>
+          <div class="stat" style="min-width:80px"><div class="stat-value">${lh.totalFiles}</div><div class="stat-label ts-xxs-m">Files</div></div>
+          ${byEl.map(([tag, c]) => `<span class="ts-xs-r" style="font-family:var(--font-family-mono)">&lt;${tag}&gt;</span> <span class="ts-xxs-m" style="color:var(--text-secondary)">${c.usages} (${c.files} files)</span>`).join('')}
+        </div>
+        ${filesBody}
+      </div>
     </div>`;
   }
 
@@ -611,11 +741,13 @@ function renderMigration() {
     const groupComps = groups[level];
     if (!groupComps || groupComps.length === 0) continue;
 
+    const legacyInSection = (level === 'simple' && legacyHtmlBlock) ? legacyHtmlBlock : '';
     sectionsHtml += `<div class="mig-section">
       <div class="mig-section-header">
         <span class="mig-section-badge ${level} ts-xs-m">${complexityLabels[level]}</span>
         <span class="ts-xs-r" style="color:var(--text-secondary)">${groupComps.length} component${groupComps.length > 1 ? 's' : ''} — ${complexityDescs[level]}</span>
       </div>
+      ${legacyInSection}
       ${groupComps.map(c => renderMigCard(c)).join('')}
     </div>`;
   }
@@ -626,7 +758,6 @@ function renderMigration() {
 
   return `<h2 class="ts-xl-sb" style="margin-bottom:var(--space-8)">Migration Plan → ${esc(mig.targetDS)}</h2>
     <p class="ts-d-r" style="color:var(--text-secondary);margin-bottom:var(--space-24)">Component-by-component migration plan. Each card includes guidelines, prop mapping, and affected files.</p>
-    ${legacyHtmlBlock}
     ${heroHtml}${toolbarHtml}${sectionsHtml}`;
 }
 
@@ -657,11 +788,9 @@ function renderMigCard(c) {
     </div>`;
   }
 
-  const filesHtml = c.files.length > 0 ? `<div style="border-top:1px solid var(--border-default);padding-top:var(--space-12)">
-    <button class="mig-files-toggle ts-xs-m" onclick="event.stopPropagation();toggleMigFiles('${c.source.replace(/'/g,"\\'")}')">
-      ${isOpen ? '▾ Hide files' : '▸ Show files'} (${c.filesAffected})
-    </button>
-    <div class="mig-file-list ${isOpen ? 'open' : ''}">
+  const filesHtml = c.files.length > 0 ? `<div class="mig-files-section" style="border-top:1px solid var(--border-default);padding-top:var(--space-12)">
+    <div class="ts-xxs-m" style="color:var(--text-secondary);margin-bottom:var(--space-8)">📄 Fichiers concernés (${c.filesAffected})</div>
+    <div class="mig-file-list">
       ${c.files.map(f => `<div class="mig-file-item">
         <span class="mig-file-path ts-xxs-r">${f.path}</span>
         <span class="mig-file-count ts-xxs-m">${f.totalOccurrences} occurrence${f.totalOccurrences > 1 ? 's' : ''}</span>
@@ -671,25 +800,31 @@ function renderMigCard(c) {
 
   const migratedBadge = c.migrated ? '<span class="mig-section-badge simple ts-xxs-m" style="background:var(--color-success);color:var(--text-complementary)">✓ Migrated</span>' : '';
   const cardStyle = c.migrated ? 'opacity:0.85;border-color:var(--color-success);' : '';
-  return `<div class="mig-card" style="${cardStyle};cursor:pointer" onclick="showMigrationModal('${c.source.replace(/'/g,"\\'")}')">
-    <div class="mig-card-header">
-      <div class="mig-swap">
-        <span class="mig-comp-name source ts-xs-m">${esc(c.source)}</span>
-        <span class="mig-arrow">→</span>
-        <span class="mig-comp-name target ts-xs-m">${esc(c.target)}</span>
+  const srcEsc = c.source.replace(/'/g, "\\'");
+  return `<div class="mig-card" style="${cardStyle}">
+    <div class="mig-card-header" onclick="toggleMigFiles('${srcEsc}')">
+      <div style="display:flex;align-items:center;flex:1">
+        <div class="mig-swap">
+          <span class="mig-comp-name source ts-xs-m">${esc(c.source)}</span>
+          <span class="mig-arrow">→</span>
+          <span class="mig-comp-name target ts-xs-m">${esc(c.target)}</span>
+        </div>
       </div>
       <div style="display:flex;align-items:center;gap:var(--space-12);flex-wrap:wrap">
         ${migratedBadge}
         ${c.effort && !c.migrated ? `<span class="ts-xxs-m" style="color:var(--text-secondary)">⏱ ${esc(c.effort)}</span>` : ''}
         <span class="mig-section-badge ${c.complexity} ts-xxs-m">${c.complexity}</span>
+        <span class="ts-xxs-r" style="color:var(--text-secondary)">${c.filesAffected} files</span>
       </div>
     </div>
-    <div class="mig-meta">
-      <div class="mig-meta-item ts-xxs-r"><span class="mig-meta-value">${c.totalUsages}</span> usages</div>
-      <div class="mig-meta-item ts-xxs-r"><span class="mig-meta-value">${c.filesAffected}</span> files</div>
-      <div class="mig-meta-item ts-xxs-r" style="font-family:var(--font-family-mono)">→ ${esc(c.targetImportPath)}</div>
+    <div class="mig-card-body ${isOpen ? 'open' : ''}">
+      <div class="mig-meta" style="margin-bottom:var(--space-12)">
+        <div class="mig-meta-item ts-xxs-r"><span class="mig-meta-value">${c.totalUsages}</span> usages</div>
+        <div class="mig-meta-item ts-xxs-r"><span class="mig-meta-value">${c.filesAffected}</span> files</div>
+        <div class="mig-meta-item ts-xxs-r" style="font-family:var(--font-family-mono)">→ ${esc(c.targetImportPath)}</div>
+      </div>
+      ${guidelinesHtml}${propsHtml}${breakingHtml}${filesHtml}
     </div>
-    ${guidelinesHtml}${propsHtml}${breakingHtml}${filesHtml}
   </div>`;
 }
 
@@ -704,8 +839,7 @@ function render() {
   if (CFG.businessLogicAnalysisEnabled || CFG.purityEnabled) html += `<div class="tab-content ${activeTab==='refactor-radar'?'active':''}">${renderRefactorRadar()}</div>`;
   html += renderMigrationModal();
   document.getElementById('app').innerHTML = html;
-  if (activeTab === 'metrics' && detailFile) showDetail(detailFile);
-  if (openMigrationModal) updateMigrationModal();
+
 }
 
 function switchTab(t) { activeTab = t; render(); }
@@ -720,6 +854,8 @@ function setApiFilter(l) { apiLocationFilter = apiLocationFilter === l ? 'all' :
 function setApiFeatureFilter(f) { apiFeatureFilter = apiFeatureFilter === f ? null : f; render(); }
 function onApiSearch(v) { apiSearchQuery = v; render(); const i = document.querySelector('.tab-content.active .search-input'); if (i) { i.focus(); i.selectionStart = i.selectionEnd = v.length; } }
 function toggleCompDetail(p) { if (openCompDetails.has(p)) openCompDetails.delete(p); else openCompDetails.add(p); render(); }
+function toggleMetricsFileDetail(p) { if (openMetricsFileDetails.has(p)) openMetricsFileDetails.delete(p); else openMetricsFileDetails.add(p); render(); }
+function toggleTokenDetail(p) { if (openTokenDetails.has(p)) openTokenDetails.delete(p); else openTokenDetails.add(p); render(); }
 function togglePhaseFiles(id) { if (openPhases.has(id)) openPhases.delete(id); else openPhases.add(id); render(); }
 function setMigFilter(level) { migComplexityFilter = migComplexityFilter === level ? 'all' : level; render(); }
 function setMigShowFilter(view) { migShowFilter = view; render(); }
@@ -736,9 +872,17 @@ function showDetail(filePath) {
   for (const v of file.flags.migrateComplex) allV.push({ ...v, cat: 'flag-complex' });
   for (const v of file.flags.todo) allV.push({ ...v, cat: 'flag-todo' });
   allV.sort((a, b) => a.line - b.line);
+  const projectRoot = report.projectRoot || '';
+  const lineLink = (path, line) => {
+    if (!projectRoot) return `L${line}`;
+    const fullPath = (projectRoot + '/' + path).replace(/\\/g, '/');
+    const uri = 'cursor://file/' + encodeURI(fullPath) + ':' + line;
+    return `<a href="${uri}" title="Open in Cursor" class="ts-xxs-r">L${line}</a>`;
+  };
   const panel = document.getElementById('detail-panel');
   panel.className = 'detail-panel open';
-  panel.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-16)"><h3 class="ts-d-m" style="font-family:var(--font-family-mono)">${file.path}</h3><button class="detail-close ts-xxs-m" onclick="closeDetail()">Close</button></div><div class="violation-list">${allV.map(v => { const c = CATS[v.cat]?.color || 'var(--color-info)'; return `<div class="violation-item"><span class="violation-line ts-xxs-r">L${v.line}</span><span class="violation-match ts-xxs-m" style="color:${c}">${v.match}</span><span class="violation-context ts-xxs-r">${esc(v.context)}</span></div>`; }).join('')}</div>`;
+  const catLabel = (cat) => CATS[cat]?.label || (cat === 'flag-simple' ? '@ds-migrate: simple' : cat === 'flag-complex' ? '@ds-migrate: complex' : cat === 'flag-todo' ? '@ds-todo' : cat);
+  panel.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-16)"><h3 class="ts-d-m" style="font-family:var(--font-family-mono)">${file.path}</h3><button class="detail-close ts-xxs-m" onclick="closeDetail()">Close</button></div><div class="violation-list">${allV.map(v => { const c = CATS[v.cat]?.color || 'var(--color-info)'; return `<div class="violation-item"><span class="violation-tag ts-xxs-m" style="background:var(--bg-base-secondary);border-left:3px solid ${c}"><span class="violation-tag-line" style="color:var(--text-tertiary)">${lineLink(file.path, v.line)}</span><span class="violation-tag-sep" style="color:var(--text-tertiary)">·</span><span class="violation-tag-label" style="color:${c}">${esc(catLabel(v.cat))}</span></span><div class="violation-content"><span class="violation-match ts-xxs-m" style="color:${c}">${esc(v.match)}</span><span class="violation-context ts-xxs-r">${esc(v.context)}</span></div></div>`; }).join('')}</div>`;
   panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 function closeDetail() { detailFile = null; document.getElementById('detail-panel').className = 'detail-panel'; }

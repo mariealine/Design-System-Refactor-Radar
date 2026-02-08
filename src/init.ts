@@ -10,7 +10,7 @@
  */
 
 import { mkdir, writeFile, readFile, access } from "node:fs/promises";
-import { join, dirname } from "node:path";
+import { join, dirname, relative } from "node:path";
 import { loadConfig, deepMerge } from "./config.js";
 import type { DsCoverageConfig } from "./config.js";
 import { generateComplianceRule } from "./templates/compliance-rule.js";
@@ -52,6 +52,7 @@ export async function init(options: InitOptions = {}): Promise<GeneratedFile[]> 
   const log = options.silent ? () => {} : console.log;
 
   let config: DsCoverageConfig;
+  let ranWizard = false;
 
   // Check if a config file already exists
   let configExists = false;
@@ -74,6 +75,7 @@ export async function init(options: InitOptions = {}): Promise<GeneratedFile[]> 
   }
 
   if (!options.noInteractive && !configExists) {
+    ranWizard = true;
     // Run interactive wizard
     const answers = await runWizard();
     const wizardConfig = buildConfigFromAnswers(answers);
@@ -226,15 +228,61 @@ export async function init(options: InitOptions = {}): Promise<GeneratedFile[]> 
     await updateGitignore(projectRoot, log);
   }
 
-  if (!options.dryRun && created.length > 0) {
-    log("  ─── What's next? ──────────────────────────────────");
+  // After wizard: run scan and show results, then commands & dashboard
+  if (!options.dryRun && ranWizard) {
+    let dashboardPath: string | undefined;
+    const sep = "  ─────────────────────────────────────────────────────";
+
+    log(sep);
+    log("  🔍  Scan results");
+    log(sep);
     log("");
-    log("  💡 Your Cursor assistant now follows your design system!");
+    try {
+      const { run } = await import("./index.js");
+      const result = await run({
+        projectRoot,
+        configPath: options.configPath,
+        dryRun: false,
+        silent: options.silent,
+      });
+      dashboardPath = result.dashboardPath;
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      log(`  ⚠️  Scan failed: ${msg}`);
+      log("  Run `npx ds-coverage` to try again.");
+      log("");
+    }
+
+    log(sep);
+    log("  📌  Commands & dashboard");
+    log(sep);
     log("");
-    log("  • Edit ds-coverage.config.js to adjust rules");
-    log("  • Re-run `npx ds-coverage init --force` after changes");
-    log("  • Run `npx ds-coverage` to scan your codebase");
-    log("  • Run `npx ds-coverage --open` to open the dashboard");
+    log("  💡 Your Cursor assistant now follows your design system. Edit ds-coverage.config.js to adjust rules.");
+    log("");
+    log("  Run the script (scan codebase):");
+    log("    $ npx ds-coverage");
+    log("");
+    log("  Open dashboard in browser:");
+    log("    $ npx ds-coverage --open");
+    if (dashboardPath) {
+      log(`    → ${relative(projectRoot, dashboardPath)}`);
+    } else {
+      log("    → ds-coverage-dashboard.html (after next scan)");
+    }
+    log("");
+    log("  Re-initialize the wizard (new config from scratch):");
+    log("    $ npx ds-coverage init --force");
+    log("");
+  } else if (!options.dryRun && created.length > 0) {
+    // Init without wizard (e.g. --force): just show commands
+    const sep = "  ─────────────────────────────────────────────────────";
+    log(sep);
+    log("  📌  Commands & dashboard");
+    log(sep);
+    log("");
+    log("  Run the script: $ npx ds-coverage");
+    log("  Open dashboard: $ npx ds-coverage --open");
+    log("  Re-initialize:  $ npx ds-coverage init --force");
     log("");
   }
 

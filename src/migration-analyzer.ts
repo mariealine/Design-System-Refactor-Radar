@@ -140,8 +140,28 @@ export function analyzeMigration(
   scanDir: string,
   config: DsCoverageConfig,
 ): MigrationReport | null {
-  if (!config.migration.enabled || config.migration.mappings.length === 0) {
+  if (!config.migration.enabled) {
     return null;
+  }
+
+  if (config.migration.mappings.length === 0) {
+    return {
+      targetDS: config.migration.targetDS || "your target design system",
+      legacyHtml: null,
+      summary: {
+        totalMappings: 0,
+        totalToMigrate: 0,
+        totalMigrated: 0,
+        totalUsages: 0,
+        totalFilesAffected: 0,
+        byComplexity: {
+          simple: { count: 0, usages: 0, files: 0 },
+          moderate: { count: 0, usages: 0, files: 0 },
+          complex: { count: 0, usages: 0, files: 0 },
+        },
+      },
+      components: [],
+    };
   }
 
   const components: MigrationComponentReport[] = [];
