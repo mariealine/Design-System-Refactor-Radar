@@ -16,7 +16,7 @@ export default defineConfig([
     entry: {
       cli: "bin/ds-coverage.ts",
     },
-    format: ["esm"],
+    format: ["cjs"],
     dts: false,
     sourcemap: true,
     target: "node20",

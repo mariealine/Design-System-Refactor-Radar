@@ -14,6 +14,8 @@ import { analyzeComponents } from "./component-analyzer.js";
 import { buildRoadmap } from "./roadmap-builder.js";
 import { buildDashboard } from "./dashboard-builder.js";
 import { analyzeMigration } from "./migration-analyzer.js";
+import { analyzeBusinessLogic } from "./business-logic-analyzer.js";
+import { analyzeImportBoundaries } from "./import-boundary-analyzer.js";
 import type { Report } from "./types.js";
 
 export type { DsCoverageConfig } from "./config.js";
@@ -58,7 +60,9 @@ export async function run(options: RunOptions = {}): Promise<RunResult> {
     config = deepMerge(config, options.config);
   }
 
-  const scanDir = join(projectRoot, config.scanDir);
+  // Normalize scan directories
+  const scanDirs = config.scanDirs || [config.scanDir];
+  const scanDir = join(projectRoot, scanDirs[0]); // Keep for backward compatibility in component analyzer
   const log = options.silent ? () => {} : console.log;
 
   // Check if config has violations defined
@@ -69,6 +73,9 @@ export async function run(options: RunOptions = {}): Promise<RunResult> {
   }
 
   log("🔍 Scanning design system coverage...\n");
+  if (scanDirs.length > 1) {
+    log(`  Scanning directories: ${scanDirs.join(", ")}\n`);
+  }
 
   // 1. Scan files
   const { fileReports, fileContents, totalFiles } = await scan(projectRoot, config);
@@ -77,10 +84,23 @@ export async function run(options: RunOptions = {}): Promise<RunResult> {
   // 2. Analyze component APIs
   const componentApi = analyzeComponents(fileReports, fileContents, scanDir, config);
 
-  // 3. Build roadmap
+  // 3. Analyze business logic (if enabled)
+  const businessLogic = analyzeBusinessLogic(fileReports, fileContents, scanDir, config);
+
+  // 4. Analyze import boundaries (if enabled)
+  const importBoundary = config.purity.enabled
+    ? await analyzeImportBoundaries(fileContents, projectRoot, config)
+    : {};
+  if (config.purity.enabled) {
+    const pureCount = Object.values(importBoundary).filter((r) => r.purity === "pure").length;
+    const impureCount = Object.values(importBoundary).filter((r) => r.purity === "impure").length;
+    log(`  Import boundary analysis: ${pureCount} pure, ${impureCount} impure UI files\n`);
+  }
+
+  // 5. Build roadmap
   const roadmap = buildRoadmap(fileReports, config);
 
-  // 3b. Analyze migration (if enabled)
+  // 6. Analyze migration (if enabled)
   const migration = analyzeMigration(fileContents, scanDir, config);
 
   // 4. Build summary
@@ -101,7 +121,7 @@ export async function run(options: RunOptions = {}): Promise<RunResult> {
 
   const report: Report = {
     generatedAt: new Date().toISOString(),
-    scanDir: relative(projectRoot, scanDir),
+    scanDir: scanDirs.length === 1 ? relative(projectRoot, scanDir) : scanDirs.join(", "),
     summary: {
       totalFiles,
       totalFilesScanned: fileReports.length,
@@ -119,15 +139,17 @@ export async function run(options: RunOptions = {}): Promise<RunResult> {
     roadmap,
     componentApi,
     migration,
+    businessLogic,
+    importBoundary,
     files: fileReports
       .filter((f) => f.totalViolations > 0 || f.totalFlags > 0)
       .sort((a, b) => b.totalViolations - a.totalViolations),
   };
 
-  // 5. Build dashboard
+  // 7. Build dashboard
   const dashboardHtml = await buildDashboard(report, config);
 
-  // 6. Write output files
+  // 8. Write output files
   const reportJsonPath = join(projectRoot, config.output.reportJson);
   const dashboardPath = join(projectRoot, config.output.dashboardHtml);
 

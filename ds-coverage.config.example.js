@@ -12,7 +12,8 @@
  */
 export default {
   // ─── What to scan ────────────────────────────────────────
-  scanDir: "src",
+  scanDir: "src", // Single directory (backward compatible)
+  // scanDirs: ["app", "components"], // Multiple directories (Next.js example)
   extensions: [".tsx", ".jsx", ".ts", ".js"],
   exclude: [
     "node_modules/",
@@ -76,8 +77,8 @@ export default {
   // ─── Component API analysis ──────────────────────────────
   componentAnalysis: {
     enabled: true,
-    directories: ["components/ui/"],
-    primaryDirectory: "components/ui/",
+    directories: ["components"],
+    primaryDirectory: "components",
     legacyDirectories: [],
     api: {
       requireCVA: false,
@@ -119,6 +120,76 @@ export default {
         businessCase: "Best coverage improvement per hour.",
         filter: { type: "quickWins" },
       },
+    ],
+  },
+
+  // ─── Business Logic Analysis ───────────────────────────
+  //
+  // Detects business logic entanglement and native HTML elements
+  // to help categorize refactoring risk (Safe/Careful/Page-level).
+  //
+  businessLogicAnalysis: {
+    enabled: true,
+    excludeDirectories: ["components/ui/"], // Exclude design system components
+    riskThresholds: {
+      safe: {
+        maxStateHooks: 2,
+        maxEffects: 0,
+        maxApiCalls: 0,
+      },
+      careful: {
+        maxStateHooks: 5,
+        maxEffects: 2,
+        maxApiCalls: 1,
+      },
+      // page-level = everything above careful thresholds
+    },
+    nativeHtmlElements: {
+      enabled: true,
+      elements: ["input", "select", "button", "label", "textarea", "form"],
+    },
+  },
+
+  // ─── Import Boundary / Purity Analysis ──────────────────
+  //
+  // AST-based analysis to detect UI components entangled with business logic
+  // through import boundary violations. Flags components that import
+  // business logic zones, Next.js server APIs, or have transitive dependencies.
+  //
+  purity: {
+    enabled: false, // Set to true to enable import boundary analysis
+    // Directories containing UI components that should be "pure" (no business logic)
+    uiCandidateDirs: ["components"],
+    // Import patterns that are allowed in UI components
+    allowedImportMatchers: [
+      "react",
+      "clsx",
+      "classnames",
+      "tailwind-merge",
+      "@radix-ui/",
+      "@/components/ui/",
+    ],
+    // Import patterns that indicate business logic entanglement
+    forbiddenImportMatchers: [
+      "@/lib/",
+      "@/server/",
+      "@/db/",
+      "@/actions/",
+      "@/features/",
+    ],
+    // Directory patterns that indicate business logic zones
+    businessDirMatchers: [
+      "app/",
+      "lib/",
+      "server/",
+      "db/",
+      "actions/",
+      "features/",
+    ],
+    // Next.js server API imports that should be flagged
+    nextServerImportMatchers: [
+      "next/headers",
+      "next/cache",
     ],
   },
 

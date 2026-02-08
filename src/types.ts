@@ -238,6 +238,51 @@ export interface MigrationReport {
 // REPORT TYPE
 // ============================================
 
+export interface BusinessLogicReport {
+  path: string;
+  nativeHtmlElements: {
+    input?: number;
+    select?: number;
+    button?: number;
+    label?: number;
+    textarea?: number;
+    form?: number;
+    total: number;
+  };
+  businessLogicSignals: {
+    apiCalls: number;
+    useStateCount: number;
+    useEffectCount: number;
+    fileUploads: boolean;
+    authFlows: boolean;
+    formHandling: boolean;
+  };
+  complexity: {
+    riskLevel: "safe" | "careful" | "page-level";
+    score: number; // 0-100, higher = more complex
+    signals: string[]; // List of detected signals
+  };
+  suggestedRefactor: {
+    category: "safe" | "careful" | "page-level";
+    rationale: string;
+    suggestedActions: string[];
+  };
+}
+
+export interface ImportBoundaryReport {
+  path: string;
+  isUiCandidate: boolean;
+  purity: "pure" | "impure";
+  score: number; // 0-100, higher = more impure
+  reasons: Array<{
+    type: "forbidden-import" | "server-api" | "transitive" | "data-fetching";
+    importPath: string;
+    resolvedPath?: string;
+    line?: number;
+    message: string;
+  }>;
+}
+
 export interface Report {
   generatedAt: string;
   scanDir: string;
@@ -261,5 +306,7 @@ export interface Report {
     components: ComponentApiReport[];
   };
   migration: MigrationReport | null;
+  businessLogic: Record<string, BusinessLogicReport>;
+  importBoundary: Record<string, ImportBoundaryReport>;
   files: FileReport[];
 }

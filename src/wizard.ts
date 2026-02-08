@@ -6,6 +6,8 @@
  */
 
 import { createInterface } from "node:readline";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import type { DsCoverageConfig } from "./config.js";
 import { getPreset, type PresetId, PRESETS_INFO } from "./presets.js";
 
@@ -18,6 +20,7 @@ export interface WizardAnswers {
   framework: Framework;
   dsStatus: DsStatus;
   scanDir: string;
+  scanDirs: string[];
   extensions: string[];
   componentDir: string;
   tokenCategories: string[];
@@ -190,8 +193,19 @@ export async function runWizard(): Promise<WizardAnswers> {
     console.log("");
     console.log("  ─── Project Structure ─────────────────────────────");
 
-    // 4. Source directory
-    const scanDir = await askText(rl, "Source directory to scan?", "src");
+    // 4. Source directories
+    const projectRoot = process.cwd();
+    const hasComponentsDir = existsSync(join(projectRoot, "components"));
+    const hasAppDir = existsSync(join(projectRoot, "app"));
+    const defaultScanDirs = hasAppDir && hasComponentsDir ? "app, components" : "src";
+    
+    const scanDirsStr = await askText(
+      rl,
+      "Source directories to scan (comma-separated)?",
+      defaultScanDirs,
+    );
+    const scanDirs = scanDirsStr.split(",").map((s) => s.trim()).filter(Boolean);
+    const scanDir = scanDirs[0] || "src"; // Keep for backward compatibility
 
     // 5. Extensions
     const defaultExtensions = getDefaultExtensions(framework);
@@ -254,7 +268,7 @@ export async function runWizard(): Promise<WizardAnswers> {
     console.log(`    CSS:           ${PRESETS_INFO[cssMethodology]?.label || cssMethodology}`);
     console.log(`    Framework:     ${getFrameworkLabel(framework)}`);
     console.log(`    Design System: ${dsStatus === "existing" ? "Existing" : "New (from scratch)"}`);
-    console.log(`    Source:        ${scanDir}/`);
+    console.log(`    Source:        ${scanDirs.length > 1 ? scanDirs.join(", ") : scanDir}/`);
     console.log(`    Extensions:    ${extensions.join(", ")}`);
     console.log(`    Components:    ${componentDir}/`);
     console.log(`    Tokens:        ${tokenCategories.join(", ")}`);
@@ -272,6 +286,7 @@ export async function runWizard(): Promise<WizardAnswers> {
       framework,
       dsStatus,
       scanDir,
+      scanDirs,
       extensions,
       componentDir,
       tokenCategories,
@@ -353,7 +368,8 @@ export function buildConfigFromAnswers(answers: WizardAnswers): Partial<DsCovera
       };
 
   return {
-    scanDir: answers.scanDir,
+    scanDir: answers.scanDir, // Keep for backward compatibility
+    scanDirs: answers.scanDirs.length > 1 ? answers.scanDirs : undefined, // Only set if multiple
     extensions: answers.extensions,
     exclude: getDefaultExclusions(answers.framework),
     violations,

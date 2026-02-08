@@ -39,7 +39,7 @@
     }
   },
   "bin": {
-    "ds-coverage": "./dist/cli.js"
+    "ds-coverage": "./dist/cli.cjs"
   },
   "scripts": {
     "build": "tsup",

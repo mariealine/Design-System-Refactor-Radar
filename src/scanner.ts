@@ -17,32 +17,43 @@ const MAX_FILE_SIZE = 512 * 1024;
 // FILE DISCOVERY
 // ============================================
 
+interface DiscoverResult {
+  files: string[];
+  /** Map of absolute file path → originating scan directory (relative to project root) */
+  dirMap: Map<string, string>;
+}
+
 async function discoverFiles(
-  scanDir: string,
+  scanDirs: string[],
   extensions: string[],
   exclude: string[],
-): Promise<string[]> {
+): Promise<DiscoverResult> {
   const files: string[] = [];
+  const dirMap = new Map<string, string>();
 
-  async function walk(dir: string): Promise<void> {
+  async function walk(dir: string, baseDir: string): Promise<void> {
     const entries = await readdir(dir, { withFileTypes: true });
     for (const entry of entries) {
       const fullPath = join(dir, entry.name);
-      const relativePath = relative(scanDir, fullPath);
+      const relativePath = relative(baseDir, fullPath);
 
       // Check exclusions
       if (exclude.some((exc) => relativePath.includes(exc))) continue;
 
       if (entry.isDirectory()) {
-        await walk(fullPath);
+        await walk(fullPath, baseDir);
       } else if (extensions.includes(extname(entry.name))) {
         files.push(fullPath);
+        dirMap.set(fullPath, baseDir);
       }
     }
   }
 
-  await walk(scanDir);
-  return files;
+  for (const scanDir of scanDirs) {
+    await walk(scanDir, scanDir);
+  }
+
+  return { files, dirMap };
 }
 
 // ============================================
@@ -185,6 +196,8 @@ export interface ScanResult {
   fileReports: FileReport[];
   /** Map of absolute file path → file content */
   fileContents: Map<string, string>;
+  /** Map of absolute file path → originating scan directory (relative to project root) */
+  dirMap: Map<string, string>;
   /** All discovered file paths (before exclusions) */
   totalFiles: number;
 }
@@ -193,24 +206,30 @@ export async function scan(
   projectRoot: string,
   config: DsCoverageConfig,
 ): Promise<ScanResult> {
-  const scanDir = join(projectRoot, config.scanDir);
+  // Normalize: use scanDirs if provided, otherwise derive from scanDir
+  const scanDirs = config.scanDirs || [config.scanDir];
+  const scanDirsAbsolute = scanDirs.map((dir) => join(projectRoot, dir));
 
-  // Verify scanDir exists
-  try {
-    const s = await stat(scanDir);
-    if (!s.isDirectory()) {
-      throw new Error(`scanDir "${config.scanDir}" is not a directory.`);
+  // Verify all scan directories exist
+  for (const scanDir of scanDirsAbsolute) {
+    try {
+      const s = await stat(scanDir);
+      if (!s.isDirectory()) {
+        const relativeDir = relative(projectRoot, scanDir);
+        throw new Error(`scanDir "${relativeDir}" is not a directory.`);
+      }
+    } catch (err: unknown) {
+      if (err instanceof Error && "code" in err && (err as NodeJS.ErrnoException).code === "ENOENT") {
+        const relativeDir = relative(projectRoot, scanDir);
+        throw new Error(
+          `scanDir "${relativeDir}" does not exist. Check your ds-coverage.config or run \`npx ds-coverage init\`.`,
+        );
+      }
+      throw err;
     }
-  } catch (err: unknown) {
-    if (err instanceof Error && "code" in err && (err as NodeJS.ErrnoException).code === "ENOENT") {
-      throw new Error(
-        `scanDir "${config.scanDir}" does not exist. Check your ds-coverage.config or run \`npx ds-coverage init\`.`,
-      );
-    }
-    throw err;
   }
 
-  const filePaths = await discoverFiles(scanDir, config.extensions, config.exclude);
+  const { files: filePaths, dirMap } = await discoverFiles(scanDirsAbsolute, config.extensions, config.exclude);
 
   // Read all file contents (skip files > MAX_FILE_SIZE)
   const fileContents = new Map<string, string>();
@@ -230,7 +249,9 @@ export async function scan(
   // Scan each file
   const fileReports: FileReport[] = [];
   for (const [fp, content] of fileContents) {
-    const relativePath = relative(scanDir, fp);
+    // Use the originating scan directory for relative path calculation
+    const baseDir = dirMap.get(fp) || scanDirsAbsolute[0];
+    const relativePath = relative(baseDir, fp);
     const report = scanFileContent(content, relativePath, config);
     fileReports.push(report);
   }
@@ -238,6 +259,7 @@ export async function scan(
   return {
     fileReports,
     fileContents,
+    dirMap,
     totalFiles: filePaths.length,
   };
 }

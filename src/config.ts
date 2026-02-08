@@ -63,9 +63,49 @@ export interface ComponentApiConfig {
   };
 }
 
+export interface BusinessLogicAnalysisConfig {
+  enabled: boolean;
+  /** Directories to exclude from business logic analysis (e.g. ['components/ui/']) */
+  excludeDirectories: string[];
+  /** Risk assessment thresholds */
+  riskThresholds: {
+    safe: {
+      maxStateHooks: number;
+      maxEffects: number;
+      maxApiCalls: number;
+    };
+    careful: {
+      maxStateHooks: number;
+      maxEffects: number;
+      maxApiCalls: number;
+    };
+  };
+  /** Native HTML element detection */
+  nativeHtmlElements: {
+    enabled: boolean;
+    elements: string[]; // ['input', 'select', 'button', 'label', 'textarea', 'form']
+  };
+}
+
+export interface PurityConfig {
+  enabled: boolean;
+  /** Directories containing UI components that should be pure (e.g. ['components']) */
+  uiCandidateDirs: string[];
+  /** Import patterns that are allowed in UI components */
+  allowedImportMatchers: string[];
+  /** Import patterns that indicate business logic entanglement */
+  forbiddenImportMatchers: string[];
+  /** Directory patterns that indicate business logic zones */
+  businessDirMatchers: string[];
+  /** Next.js server API imports that should be flagged */
+  nextServerImportMatchers: string[];
+}
+
 export interface DsCoverageConfig {
-  /** Directory to scan (relative to project root) */
+  /** Directory to scan (relative to project root) - kept for backward compatibility */
   scanDir: string;
+  /** Directories to scan (relative to project root) - if provided, overrides scanDir */
+  scanDirs?: string[];
   /** File extensions to scan */
   extensions: string[];
   /** Paths to exclude (substring match) */
@@ -125,6 +165,12 @@ export interface DsCoverageConfig {
       effort?: string;
     }>;
   };
+
+  /** Business logic analysis configuration */
+  businessLogicAnalysis: BusinessLogicAnalysisConfig;
+
+  /** Purity contract configuration for import boundary analysis */
+  purity: PurityConfig;
 
   /** Dashboard customization */
   dashboard: {
@@ -217,6 +263,36 @@ export const DEFAULT_CONFIG: DsCoverageConfig = {
     enabled: false,
     targetDS: "",
     mappings: [],
+  },
+
+  businessLogicAnalysis: {
+    enabled: false,
+    excludeDirectories: ["components/ui/"],
+    riskThresholds: {
+      safe: {
+        maxStateHooks: 2,
+        maxEffects: 0,
+        maxApiCalls: 0,
+      },
+      careful: {
+        maxStateHooks: 5,
+        maxEffects: 2,
+        maxApiCalls: 1,
+      },
+    },
+    nativeHtmlElements: {
+      enabled: true,
+      elements: ["input", "select", "button", "label", "textarea", "form"],
+    },
+  },
+
+  purity: {
+    enabled: false,
+    uiCandidateDirs: ["components"],
+    allowedImportMatchers: ["react", "clsx", "classnames", "tailwind-merge", "@radix-ui/", "@/components/ui/"],
+    forbiddenImportMatchers: ["@/lib/", "@/server/", "@/db/", "@/actions/", "@/features/"],
+    businessDirMatchers: ["app/", "lib/", "server/", "db/", "actions/", "features/"],
+    nextServerImportMatchers: ["next/headers", "next/cache"],
   },
 
   dashboard: {
@@ -324,16 +400,22 @@ async function loadSingleConfig(filePath: string, displayName: string): Promise<
 // ============================================
 
 const KNOWN_TOP_KEYS = new Set([
-  "scanDir", "extensions", "exclude",
+  "scanDir", "scanDirs", "extensions", "exclude",
   "violations", "flags",
-  "componentAnalysis", "roadmap", "migration",
+  "componentAnalysis", "roadmap", "migration", "businessLogicAnalysis", "purity",
   "dashboard", "output",
 ]);
 
 function validateConfig(config: DsCoverageConfig): DsCoverageConfig {
   // Warn about unknown top-level keys
+  // #region agent log
+  fetch('http://127.0.0.1:7243/ingest/814a5ae4-8c5f-48a6-9956-2a37bb1e2e37',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'config.ts:411',message:'validateConfig called',data:{knownKeys:Array.from(KNOWN_TOP_KEYS),configKeys:Object.keys(config)},timestamp:Date.now()})}).catch(()=>{});
+  // #endregion
   for (const key of Object.keys(config)) {
     if (!KNOWN_TOP_KEYS.has(key)) {
+      // #region agent log
+      fetch('http://127.0.0.1:7243/ingest/814a5ae4-8c5f-48a6-9956-2a37bb1e2e37',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'config.ts:415',message:'Unknown key detected',data:{key,knownKeys:Array.from(KNOWN_TOP_KEYS)},timestamp:Date.now()})}).catch(()=>{});
+      // #endregion
       console.warn(`⚠️  ds-coverage config: unknown key "${key}" — will be ignored. Check for typos.`);
     }
   }
