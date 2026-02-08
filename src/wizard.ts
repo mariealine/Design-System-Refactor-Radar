@@ -8,6 +8,7 @@
 import { createInterface } from "node:readline";
 import type { DsCoverageConfig } from "./config.js";
 import { getPreset, type PresetId, PRESETS_INFO } from "./presets.js";
+import { COPY, WIZARD_STEP_LABELS } from "./wizard-copy.js";
 
 // ============================================
 // TYPES
@@ -72,7 +73,7 @@ async function ask(rl: ReturnType<typeof createInterface>, question: string): Pr
 async function askChoice(
   rl: ReturnType<typeof createInterface>,
   question: string,
-  options: { key: string; label: string }[],
+  options: readonly { key: string; label: string }[],
   defaultIdx = 0,
   currentKey?: string,
 ): Promise<string> {
@@ -83,12 +84,12 @@ async function askChoice(
 
   console.log(`\n  ${question}\n`);
   for (let i = 0; i < options.length; i++) {
-    const marker = i === effectiveDefault ? "›" : " ";
-    console.log(`    ${marker} [${i + 1}] ${options[i].label}`);
+    const marker = i === effectiveDefault ? "▸" : " ";
+    console.log(`    ${marker}  [${i + 1}]  ${options[i].label}`);
   }
   console.log("");
 
-  const answer = await ask(rl, `  Your choice (1-${options.length}) [${effectiveDefault + 1}]: `);
+  const answer = await ask(rl, COPY.navigation.choicePrompt(1, options.length, effectiveDefault + 1));
   const idx = answer ? parseInt(answer, 10) - 1 : effectiveDefault;
   if (idx >= 0 && idx < options.length) {
     return options[idx].key;
@@ -99,7 +100,7 @@ async function askChoice(
 async function askMultiChoice(
   rl: ReturnType<typeof createInterface>,
   question: string,
-  options: { key: string; label: string; defaultOn: boolean }[],
+  options: readonly { key: string; label: string; defaultOn: boolean }[],
   currentSelection?: string[],
 ): Promise<string[]> {
   const defaultKeys =
@@ -113,15 +114,12 @@ async function askMultiChoice(
 
   console.log(`\n  ${question}\n`);
   for (let i = 0; i < options.length; i++) {
-    const check = defaultKeys.includes(options[i].key) ? "✓" : " ";
-    console.log(`    [${i + 1}] ${check} ${options[i].label}`);
+    const check = defaultKeys.includes(options[i].key) ? "☑" : "☐";
+    console.log(`    ${check}  [${i + 1}]  ${options[i].label}`);
   }
   console.log("");
 
-  const answer = await ask(
-    rl,
-    `  Enter numbers separated by commas [${defaultNums}]: `,
-  );
+  const answer = await ask(rl, COPY.navigation.multiPrompt(defaultNums));
 
   if (!answer) {
     return defaultKeys;
@@ -145,7 +143,8 @@ async function askText(
   question: string,
   defaultValue: string,
 ): Promise<string> {
-  const answer = await ask(rl, `\n  ${question} [${defaultValue}]: `);
+  console.log(`\n  ${question}`);
+  const answer = await ask(rl, COPY.navigation.textPrompt(defaultValue));
   return answer || defaultValue;
 }
 
@@ -153,163 +152,190 @@ async function askText(
 // WIZARD FLOW
 // ============================================
 
-const WIZARD_STEP_LABELS = [
-  "CSS methodology",
-  "Framework",
-  "Design system status",
-  "Source directory",
-  "File extensions",
-  "Component directory",
-  "Component architecture",
-  "Token categories",
-  "Migration",
-] as const;
-
 type WizardState = Partial<WizardAnswers>;
 
-async function runStepsFrom(
+function showSectionIfFirst(step: number): void {
+  const sep = "  ─────────────────────────────────────────────────────";
+  if (step === 0) {
+    console.log("");
+    console.log(sep);
+    console.log(`  ${COPY.sections.techStack.title}`);
+    console.log(`  ${COPY.sections.techStack.hint}`);
+    console.log(sep);
+  } else if (step === 3) {
+    console.log("");
+    console.log(sep);
+    console.log(`  ${COPY.sections.projectStructure.title}`);
+    console.log(`  ${COPY.sections.projectStructure.hint}`);
+    console.log(sep);
+  } else if (step === 7) {
+    console.log("");
+    console.log(sep);
+    console.log(`  ${COPY.sections.designTokens.title}`);
+    console.log(`  ${COPY.sections.designTokens.hint}`);
+    console.log(sep);
+  } else if (step === 8) {
+    console.log("");
+    console.log(sep);
+    console.log(`  ${COPY.sections.migration.title}`);
+    console.log(`  ${COPY.sections.migration.hint}`);
+    console.log(sep);
+  }
+}
+
+async function runSingleStep(
   rl: ReturnType<typeof createInterface>,
   state: WizardState,
-  fromStep: number,
+  step: number,
 ): Promise<WizardState> {
-  const a = state;
+  const a = { ...state };
 
-  if (fromStep <= 0) {
-    console.log("");
-    if (state.cssMethodology == null) {
-      console.log("  ─── Tech Stack ───────────────────────────────────");
-    }
+  showSectionIfFirst(step);
+
+  if (step === 0) {
+    if (COPY.steps.cssMethodology.hint) console.log(`  💡 ${COPY.steps.cssMethodology.hint}\n`);
     a.cssMethodology = (await askChoice(
       rl,
-      "Which CSS methodology do you use?",
-      [
-        { key: "tailwind", label: "Tailwind CSS" },
-        { key: "css-modules", label: "CSS Modules" },
-        { key: "css-in-js", label: "CSS-in-JS (styled-components, Emotion, etc.)" },
-        { key: "vanilla-css", label: "CSS / SCSS / LESS (classic)" },
-        { key: "utility-custom", label: "Custom utility-first" },
-        { key: "none", label: "Not decided yet / Other" },
-      ],
+      COPY.steps.cssMethodology.question,
+      COPY.steps.cssMethodology.options,
       0,
       a.cssMethodology,
     )) as CssMethodology;
+    return a;
   }
 
-  if (fromStep <= 1) {
+  if (step === 1) {
     a.framework = (await askChoice(
       rl,
-      "Which frontend framework?",
-      [
-        { key: "react", label: "React (JSX / TSX)" },
-        { key: "vue", label: "Vue (SFC)" },
-        { key: "svelte", label: "Svelte" },
-        { key: "vanilla", label: "Vanilla JS / TypeScript" },
-        { key: "other", label: "Other" },
-      ],
+      COPY.steps.framework.question,
+      COPY.steps.framework.options,
       0,
       a.framework,
     )) as Framework;
+    return a;
   }
 
-  if (fromStep <= 2) {
+  if (step === 2) {
+    if (COPY.steps.dsStatus.hint) console.log(`  💡 ${COPY.steps.dsStatus.hint}\n`);
     a.dsStatus = (await askChoice(
       rl,
-      "What is the current state of your design system?",
-      [
-        { key: "existing", label: "I have an existing design system to enforce" },
-        { key: "from-scratch", label: "Starting from scratch — I want to build one" },
-      ],
+      COPY.steps.dsStatus.question,
+      COPY.steps.dsStatus.options,
       0,
       a.dsStatus,
     )) as DsStatus;
+    return a;
   }
 
-  if (fromStep <= 3) {
-    console.log("");
-    console.log("  ─── Project Structure ─────────────────────────────");
-    a.scanDir = await askText(rl, "Source directory to scan?", a.scanDir ?? "src");
+  if (step === 3) {
+    if (COPY.steps.scanDir.hint) console.log(`  💡 ${COPY.steps.scanDir.hint}\n`);
+    a.scanDir = await askText(
+      rl,
+      COPY.steps.scanDir.question,
+      a.scanDir ?? COPY.steps.scanDir.default,
+    );
+    return a;
   }
 
-  if (fromStep <= 4) {
+  if (step === 4) {
+    if (COPY.steps.extensions.hint) console.log(`  💡 ${COPY.steps.extensions.hint}\n`);
     const defaultExtensions = getDefaultExtensions(a.framework ?? "react");
     const defaultStr = (a.extensions?.length ? a.extensions.join(", ") : defaultExtensions.join(", ")) as string;
-    const extensionsStr = await askText(
-      rl,
-      "File extensions (comma-separated)?",
-      defaultStr,
-    );
+    const extensionsStr = await askText(rl, COPY.steps.extensions.question, defaultStr);
     a.extensions = extensionsStr.split(",").map((s) => s.trim()).filter(Boolean);
+    return a;
   }
 
-  if (fromStep <= 5) {
+  if (step === 5) {
+    if (COPY.steps.componentDir.hint) console.log(`  💡 ${COPY.steps.componentDir.hint}\n`);
     a.componentDir = await askText(
       rl,
-      "Reusable UI components directory?",
-      a.componentDir ?? "components/ui",
+      COPY.steps.componentDir.question,
+      a.componentDir ?? COPY.steps.componentDir.default,
     );
+    return a;
   }
 
-  if (fromStep <= 6) {
+  if (step === 6) {
+    if (COPY.steps.componentArchitecture.hint) console.log(`  💡 ${COPY.steps.componentArchitecture.hint}\n`);
     a.componentArchitecture = (await askChoice(
       rl,
-      "Which architecture for your components?",
+      COPY.steps.componentArchitecture.question,
       getComponentArchitectureOptions(a.cssMethodology ?? "tailwind"),
       0,
       a.componentArchitecture,
     )) as ComponentArchitecture;
+    return a;
   }
 
-  if (fromStep <= 7) {
-    console.log("");
-    console.log("  ─── Design Tokens ─────────────────────────────────");
+  if (step === 7) {
+    if (COPY.steps.tokenCategories.hint) console.log(`  💡 ${COPY.steps.tokenCategories.hint}\n`);
     a.tokenCategories = await askMultiChoice(
       rl,
-      "Which token categories do you want to enforce?",
+      COPY.steps.tokenCategories.question,
       getTokenCategoryOptions(a.cssMethodology ?? "tailwind"),
       a.tokenCategories,
     );
+    return a;
   }
 
-  if (fromStep <= 8) {
-    console.log("");
-    console.log("  ─── Migration (optional) ─────────────────────────");
+  if (step === 8) {
+    if (COPY.steps.migrationPlan.hint) console.log(`  💡 ${COPY.steps.migrationPlan.hint}\n`);
     const wantsMigration = await askChoice(
       rl,
-      "Are you planning a component library migration?",
-      [
-        { key: "no", label: "No, not at this time" },
-        { key: "yes", label: "Yes, I want to plan a migration" },
-      ],
+      COPY.steps.migrationPlan.question,
+      COPY.steps.migrationPlan.options,
       0,
       a.migrationTargetDS ? "yes" : "no",
     );
-
     if (wantsMigration === "yes") {
-      a.migrationTargetDS = await askText(
+      if (COPY.steps.migrationTarget.hint) console.log(`  💡 ${COPY.steps.migrationTarget.hint}\n`);
+      const targetChoice = await askChoice(
         rl,
-        "Target design system name (e.g. shadcn/ui, Radix, Custom DS v2)?",
-        a.migrationTargetDS ?? "shadcn/ui",
+        COPY.steps.migrationTarget.question,
+        COPY.steps.migrationTarget.options,
+        0,
+        a.migrationTargetDS && COPY.steps.migrationTarget.options.some((o) => o.key === a.migrationTargetDS)
+          ? a.migrationTargetDS
+          : undefined,
       );
+      if (targetChoice === "Other") {
+        const custom = await askText(
+          rl,
+          COPY.steps.migrationTarget.otherPrompt,
+          a.migrationTargetDS ?? COPY.steps.migrationTarget.default,
+        );
+        a.migrationTargetDS = custom;
+      } else {
+        a.migrationTargetDS = targetChoice;
+      }
     } else {
       a.migrationTargetDS = "";
     }
+    return a;
   }
 
   return a;
 }
 
 function showSummary(a: WizardState): void {
+  const sep = "  ─────────────────────────────────────────────────────";
   console.log("");
-  console.log("  ─── Summary ───────────────────────────────────────");
+  console.log(sep);
+  console.log(`  ${COPY.summary.title}`);
+  console.log(sep);
   console.log("");
-  console.log(`    CSS:           ${PRESETS_INFO[a.cssMethodology!]?.label ?? a.cssMethodology}`);
-  console.log(`    Framework:     ${getFrameworkLabel(a.framework!)}`);
-  console.log(`    Design System: ${a.dsStatus === "existing" ? "Existing" : "New (from scratch)"}`);
-  console.log(`    Source:        ${a.scanDir}/`);
-  console.log(`    Extensions:    ${a.extensions?.join(", ") ?? ""}`);
-  console.log(`    Components:    ${a.componentDir}/`);
-  console.log(`    Tokens:        ${a.tokenCategories?.join(", ") ?? ""}`);
-  if (a.migrationTargetDS) console.log(`    Migration →    ${a.migrationTargetDS}`);
+  console.log(`  ${COPY.summary.intro}`);
+  console.log("");
+  console.log(`    • ${COPY.summary.labels.css}:           ${PRESETS_INFO[a.cssMethodology!]?.label ?? a.cssMethodology}`);
+  console.log(`    • ${COPY.summary.labels.framework}:     ${getFrameworkLabel(a.framework!)}`);
+  console.log(`    • ${COPY.summary.labels.dsStatus}:     ${a.dsStatus === "existing" ? "Existing" : "New (from scratch)"}`);
+  console.log(`    • ${COPY.summary.labels.scanDir}:       ${a.scanDir}/`);
+  console.log(`    • ${COPY.summary.labels.extensions}:    ${a.extensions?.join(", ") ?? ""}`);
+  console.log(`    • ${COPY.summary.labels.componentDir}: ${a.componentDir}/`);
+  console.log(`    • ${COPY.summary.labels.componentArchitecture}: ${a.componentArchitecture ?? ""}`);
+  console.log(`    • ${COPY.summary.labels.tokenCategories}: ${a.tokenCategories?.join(", ") ?? ""}`);
+  if (a.migrationTargetDS) console.log(`    • ${COPY.summary.labels.migration}: ${a.migrationTargetDS}`);
   console.log("");
 }
 
@@ -318,48 +344,74 @@ export async function runWizard(): Promise<WizardAnswers> {
 
   try {
     console.log("");
-    console.log("  ╔════════════════════════════════════════════════╗");
-    console.log("  ║  📐 DS Coverage — Configuration Wizard        ║");
-    console.log("  ╚════════════════════════════════════════════════╝");
+    const boxWidth = 52;
+    const titleWithIcon = `   📐  ${COPY.intro.title}`;
+    const paddedTitle = titleWithIcon.padEnd(boxWidth).slice(0, boxWidth);
+    console.log("  ╭────────────────────────────────────────────────────╮");
+    console.log("  │                                                    │");
+    console.log(`  │${paddedTitle}│`);
+    console.log("  │                                                    │");
+    console.log("  ╰────────────────────────────────────────────────────╯");
     console.log("");
-    console.log("  This wizard will configure your design system guidelines");
-    console.log("  and generate Cursor rules to guide your development.");
-    console.log("  You can go back to edit any answer from the summary.");
+    console.log(`  ${COPY.intro.line1}`);
+    console.log(`  ${COPY.intro.line2}`);
+    console.log(`  ${COPY.intro.line3}`);
+    console.log("");
+    console.log(`  ${COPY.intro.line4}`);
     console.log("");
 
     let state: WizardState = {};
+    let step = 0;
+
+    while (step <= 8) {
+      state = await runSingleStep(rl, state, step);
+      if (step < 8) {
+        const nav = await ask(rl, COPY.navigation.nextOrBack);
+        if (nav.toLowerCase() === "b" && step > 0) {
+          step--;
+          continue;
+        }
+      }
+      step++;
+    }
+
+    showSummary(state);
 
     for (;;) {
-      state = await runStepsFrom(rl, state, 0);
-      showSummary(state);
-
-      const confirm = await ask(rl, "  Confirm and generate? (Y/n): ");
+      const confirm = await ask(rl, COPY.summary.confirm);
       if (confirm.toLowerCase() !== "n" && confirm.toLowerCase() !== "no") {
-        break;
+        return state as WizardAnswers;
       }
 
       console.log("");
-      console.log("  Which step do you want to edit?");
+      console.log(`  ${COPY.summary.whichStepEdit}`);
+      console.log("");
       for (let i = 0; i < WIZARD_STEP_LABELS.length; i++) {
-        console.log(`    [${i + 1}] ${WIZARD_STEP_LABELS[i]}`);
+        console.log(`    [${i + 1}]  ${WIZARD_STEP_LABELS[i]}`);
       }
       console.log("");
 
-      const editInput = await ask(
-        rl,
-        `  Enter step number (1-${WIZARD_STEP_LABELS.length}), or Enter to cancel: `,
-      );
+      const editInput = await ask(rl, COPY.summary.stepEditPrompt(WIZARD_STEP_LABELS.length));
       const editNum = editInput ? parseInt(editInput.trim(), 10) : 0;
       if (editNum < 1 || editNum > WIZARD_STEP_LABELS.length) {
-        console.log("\n  Cancelled. Re-run `npx ds-coverage init` to start over.\n");
+        console.log(COPY.summary.cancelled);
         process.exit(0);
       }
 
-      const fromStep = editNum - 1;
-      state = await runStepsFrom(rl, state, fromStep);
+      step = editNum - 1;
+      while (step <= 8) {
+        state = await runSingleStep(rl, state, step);
+        if (step < 8) {
+          const nav = await ask(rl, COPY.navigation.nextOrBack);
+          if (nav.toLowerCase() === "b" && step > 0) {
+            step--;
+            continue;
+          }
+        }
+        step++;
+      }
+      showSummary(state);
     }
-
-    return state as WizardAnswers;
   } finally {
     rl.close();
   }
@@ -493,19 +545,20 @@ function getDefaultExclusions(framework: Framework): string[] {
 function getComponentArchitectureOptions(
   css: CssMethodology,
 ): { key: string; label: string }[] {
+  const c = COPY.steps.componentArchitecture;
   const options: { key: string; label: string }[] = [];
 
   if (css === "tailwind" || css === "utility-custom") {
-    options.push({ key: "cva", label: "CVA (Class Variance Authority) — recommended with utility classes" });
+    options.push({ key: "cva", label: c.optionsCva });
   }
   if (css === "css-in-js") {
-    options.push({ key: "styled-components", label: "Styled Components / Emotion — variants via props" });
+    options.push({ key: "styled-components", label: c.optionsStyled });
   }
   if (css === "css-modules") {
-    options.push({ key: "css-modules", label: "CSS Modules — variants via conditional classNames" });
+    options.push({ key: "css-modules", label: c.optionsCssModules });
   }
-  options.push({ key: "vanilla", label: "Classic CSS — BEM or custom conventions" });
-  options.push({ key: "other", label: "Other / I'll decide later" });
+  options.push({ key: "vanilla", label: c.optionsVanilla });
+  options.push({ key: "other", label: c.optionsOther });
 
   return options;
 }
@@ -513,14 +566,16 @@ function getComponentArchitectureOptions(
 function getTokenCategoryOptions(
   css: CssMethodology,
 ): { key: string; label: string; defaultOn: boolean }[] {
-  return [
-    { key: "colors", label: "Colors", defaultOn: true },
-    { key: "typography", label: "Typography", defaultOn: true },
-    { key: "spacing", label: "Spacing (margin, padding, gap)", defaultOn: css === "tailwind" },
-    { key: "radius", label: "Border radius", defaultOn: true },
-    { key: "shadows", label: "Shadows", defaultOn: true },
-    { key: "darkMode", label: "Dark mode (semantic enforcement)", defaultOn: css === "tailwind" },
-  ];
+  const labels = COPY.steps.tokenCategories.optionLabels;
+  const defaultOn: Record<string, boolean> = {
+    colors: true,
+    typography: true,
+    spacing: css === "tailwind",
+    radius: true,
+    shadows: true,
+    darkMode: css === "tailwind",
+  };
+  return labels.map((o) => ({ ...o, defaultOn: defaultOn[o.key] ?? false }));
 }
 
 function getFrameworkLabel(framework: Framework): string {
