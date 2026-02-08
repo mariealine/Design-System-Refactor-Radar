@@ -12,6 +12,10 @@ Detect hardcoded design tokens, audit component APIs, plan library migrations, a
 4. **Generates a dashboard** — a self-contained HTML file with interactive charts, tables, and filters
 5. **Scaffolds AI rules** — Cursor rules & skills that keep your AI assistant aligned with your design system
 
+![Design System Refactor Radar dashboard](docs/dashboard-screenshot.png)
+
+*The generated dashboard: coverage metrics, violations by category (colors, typography, spacing, radius, shadows, dark mode), migration flags, and a searchable file-by-file violation table.*
+
 ## Key concepts (for beginners)
 
 - **Design system** — Your shared colors, typography, spacing, and component patterns. Design System Refactor Radar helps you keep the codebase consistent with these decisions.
