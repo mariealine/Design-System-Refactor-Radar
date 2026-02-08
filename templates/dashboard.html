@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DS Coverage Dashboard</title>
+  <title>Design System Refactor Radar Dashboard</title>
   <!-- __DS_INLINE_DATA__ -->
   <style>
     :root {
@@ -293,7 +293,7 @@
     <div class="spinner"></div>
     <div class="ts-d-m">Loading report...</div>
     <div class="ts-xxs-r" style="color: var(--text-tertiary);">
-      Run <code style="background:var(--bg-base-secondary);padding:var(--space-2) var(--space-6);border-radius:var(--radius-4);">npx ds-coverage</code> first if no report exists.
+      Run <code style="background:var(--bg-base-secondary);padding:var(--space-2) var(--space-6);border-radius:var(--radius-4);">npx design-system-refactor-radar</code> first if no report exists.
     </div>
   </div>
 </div>
@@ -301,7 +301,7 @@
 // ============================================
 // Dashboard — reads categories and config from embedded data
 // ============================================
-const CFG = window.__DS_CONFIG__ || { title: 'DS Coverage', subtitle: '', categories: {}, componentAnalysisEnabled: false, roadmapEnabled: false, migrationEnabled: false, businessLogicAnalysisEnabled: false, purityEnabled: false, expectedProps: [], expectedSizes: [], forbiddenProps: [], forbiddenSizes: [] };
+const CFG = window.__DS_CONFIG__ || { title: 'Design System Refactor Radar', subtitle: '', categories: {}, componentAnalysisEnabled: false, roadmapEnabled: false, migrationEnabled: false, businessLogicAnalysisEnabled: false, purityEnabled: false, expectedProps: [], expectedSizes: [], forbiddenProps: [], forbiddenSizes: [] };
 const CATS = CFG.categories;
 const CAT_KEYS = Object.keys(CATS);
 
@@ -334,12 +334,12 @@ let refactorRadarRiskFilter = 'all'; // 'all' | 'safe' | 'careful' | 'page-level
 async function loadReport() {
   if (window.__DS_REPORT__) { report = window.__DS_REPORT__; render(); return; }
   try {
-    const res = await fetch('./ds-coverage-report.json');
+    const res = await fetch('./design-system-refactor-radar-report.json');
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     report = await res.json();
     render();
   } catch (e) {
-    document.getElementById('app').innerHTML = `<div class="empty-state"><div class="icon">📊</div><h2 class="ts-xl-sb">No report found</h2><p class="ts-d-r" style="margin-top:var(--space-8)">Run the scanner first:</p><code style="display:inline-block;margin-top:var(--space-12);background:var(--bg-base-secondary);padding:var(--space-8) var(--space-16);border-radius:var(--radius-8);">npx ds-coverage</code></div>`;
+    document.getElementById('app').innerHTML = `<div class="empty-state"><div class="icon">📊</div><h2 class="ts-xl-sb">No report found</h2><p class="ts-d-r" style="margin-top:var(--space-8)">Run the scanner first:</p><code style="display:inline-block;margin-top:var(--space-12);background:var(--bg-base-secondary);padding:var(--space-8) var(--space-16);border-radius:var(--radius-8);">npx design-system-refactor-radar</code></div>`;
   }
 }
 
@@ -673,7 +673,7 @@ function renderRoadmap() {
   if (!r) return '<div class="empty-state ts-d-r">No roadmap data.</div>';
   const phasesHtml = r.phases.map((p, i) => { const isOpen = openPhases.has(p.id);
     const pid = String(p.id).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-    return `<div class="phase-card"><div class="phase-header" onclick="togglePhaseFiles('${pid}')"><div class="phase-title"><span class="phase-number ts-xxs-m">${i+1}</span><span class="ts-l-m">${esc(p.title)}</span></div><div class="phase-stats" style="margin:0"><span class="phase-stat-value ts-d-m">${p.filesCount}</span><span class="phase-stat-label ts-xxs-r"> files</span> · <span class="phase-stat-value ts-d-m">${p.violationsCount}</span><span class="phase-stat-label ts-xxs-r"> violations</span></div></div><div class="phase-card-body ${isOpen?'open':''}"><div class="phase-desc ts-xs-r">${esc(p.description)}</div>${p.businessCase?`<div class="biz-case"><div class="ts-xxs-m" style="color:var(--text-secondary);margin-bottom:var(--space-4);text-transform:uppercase;letter-spacing:0.05em">Why prioritize</div><div class="ts-xs-r" style="color:var(--text-primary)">${esc(p.businessCase)}</div></div>`:''}<div class="phase-stats"><div><span class="phase-stat-value ts-d-m">${p.filesCount}</span><span class="phase-stat-label ts-xxs-r"> files</span></div><div><span class="phase-stat-value ts-d-m">${p.violationsCount}</span><span class="phase-stat-label ts-xxs-r"> violations</span></div></div><div class="phase-files"><div class="ts-xxs-m" style="color:var(--text-secondary);margin-bottom:var(--space-8)">📄 Fichiers concernés (${p.files.length})</div><div class="phase-file-list open">${p.files.map(f=>`<div class="phase-file-item"><span class="phase-file-path ts-xxs-r">${esc(f.path)}</span><span class="phase-file-count ts-xxs-m">${f.count}</span></div>`).join('')}</div></div></div></div>`; }).join('');
+    return `<div class="phase-card"><div class="phase-header" onclick="togglePhaseFiles('${pid}')"><div class="phase-title"><span class="phase-number ts-xxs-m">${i+1}</span><span class="ts-l-m">${esc(p.title)}</span></div><div class="phase-stats" style="margin:0"><span class="phase-stat-value ts-d-m">${p.filesCount}</span><span class="phase-stat-label ts-xxs-r"> files</span> · <span class="phase-stat-value ts-d-m">${p.violationsCount}</span><span class="phase-stat-label ts-xxs-r"> violations</span></div></div><div class="phase-card-body ${isOpen?'open':''}"><div class="phase-desc ts-xs-r">${esc(p.description)}</div>${p.businessCase?`<div class="biz-case"><div class="ts-xxs-m" style="color:var(--text-secondary);margin-bottom:var(--space-4);text-transform:uppercase;letter-spacing:0.05em">Why prioritize</div><div class="ts-xs-r" style="color:var(--text-primary)">${esc(p.businessCase)}</div></div>`:''}<div class="phase-stats"><div><span class="phase-stat-value ts-d-m">${p.filesCount}</span><span class="phase-stat-label ts-xxs-r"> files</span></div><div><span class="phase-stat-value ts-d-m">${p.violationsCount}</span><span class="phase-stat-label ts-xxs-r"> violations</span></div></div><div class="phase-files"><div class="ts-xxs-m" style="color:var(--text-secondary);margin-bottom:var(--space-8)">📄 Affected files (${p.files.length})</div><div class="phase-file-list open">${p.files.map(f=>`<div class="phase-file-item"><span class="phase-file-path ts-xxs-r">${esc(f.path)}</span><span class="phase-file-count ts-xxs-m">${f.count}</span></div>`).join('')}</div></div></div></div>`; }).join('');
   const topDirs = r.directories.slice(0, 15);
   const dirHtml = topDirs.map(d => `<div class="dir-card"><div class="ts-xxs-m" style="font-family:var(--font-family-mono);margin-bottom:var(--space-8);word-break:break-all">${d.path}/</div><div class="dir-bar"><div class="dir-bar-fill" style="width:${d.coveragePercent}%;background:${getCoverageColor(d.coveragePercent)}"></div></div><div class="dir-stats ts-xxs-r"><span>${d.coveragePercent}% compliant</span><span>${d.filesWithViolations}/${d.totalFiles} with debt</span><span>${d.totalViolations} violations</span></div></div>`).join('');
   return `<h2 class="ts-xl-sb" style="margin-bottom:var(--space-8)">Refactoring Roadmap</h2><p class="ts-d-r" style="color:var(--text-secondary);margin-bottom:var(--space-24)">Migration phases ordered by impact. Each includes a business case and affected files.</p>${phasesHtml}<h2 class="ts-xl-sb" style="margin-top:var(--space-32);margin-bottom:var(--space-8)">Coverage by Directory</h2><p class="ts-d-r" style="color:var(--text-secondary);margin-bottom:var(--space-16)">Directories sorted by most violations.</p><div class="dir-grid">${dirHtml}</div>`;
@@ -681,7 +681,7 @@ function renderRoadmap() {
 
 function renderMigration() {
   const mig = report.migration;
-  if (!mig) return '<div class="empty-state"><div class="icon">🔄</div><h2 class="ts-xl-sb">No migration plan</h2><p class="ts-d-r" style="margin-top:var(--space-8);color:var(--text-secondary)">Enable <code>migration.enabled</code> and add <code>migration.mappings</code> in your ds-coverage config, then run the scan again.</p></div>';
+  if (!mig) return '<div class="empty-state"><div class="icon">🔄</div><h2 class="ts-xl-sb">No migration plan</h2><p class="ts-d-r" style="margin-top:var(--space-8);color:var(--text-secondary)">Enable <code>migration.enabled</code> and add <code>migration.mappings</code> in your design-system-refactor-radar config, then run the scan again.</p></div>';
   const ms = mig.summary;
   if (ms.totalMappings === 0) return '<div class="empty-state"><div class="icon">📋</div><h2 class="ts-xl-sb">No component mappings yet</h2><p class="ts-d-r" style="margin-top:var(--space-8);color:var(--text-secondary)">Add entries to <code>migration.mappings</code> in your config to track migration from your current library to the target.</p></div>';
 
@@ -703,7 +703,7 @@ function renderMigration() {
     const lh = mig.legacyHtml;
     const byEl = Object.entries(lh.byElement).filter(([, c]) => c.usages > 0).sort((a, b) => b[1].usages - a[1].usages);
     const isLegacyOpen = openMigFiles.has('__legacy-html__');
-    const filesBody = lh.fileDetails.length > 0 ? `<div class="mig-files-section" style="border-top:1px solid var(--border-default);padding-top:var(--space-12)"><div class="ts-xxs-m" style="color:var(--text-secondary);margin-bottom:var(--space-8)">📄 Fichiers concernés (${lh.fileDetails.length})</div><ul class="mig-file-list" style="max-height:200px;overflow:auto">${lh.fileDetails.slice(0, 30).map(f => `<li class="mig-file-item"><span class="mig-file-path ts-xxs-r">${esc(f.path)}</span><span class="ts-xxs-m">${f.total} element${f.total > 1 ? 's' : ''}</span> ${Object.entries(f.byElement).map(([tag, n]) => `<span class="ts-xxs-r" style="color:var(--text-secondary)">&lt;${tag}&gt;: ${n}</span>`).join(' ')}</li>`).join('')}</ul>${lh.fileDetails.length > 30 ? `<p class="ts-xxs-r" style="color:var(--text-secondary);margin-top:var(--space-4)">… and ${lh.fileDetails.length - 30} more files</p>` : ''}</div>` : '';
+    const filesBody = lh.fileDetails.length > 0 ? `<div class="mig-files-section" style="border-top:1px solid var(--border-default);padding-top:var(--space-12)"><div class="ts-xxs-m" style="color:var(--text-secondary);margin-bottom:var(--space-8)">📄 Affected files (${lh.fileDetails.length})</div><ul class="mig-file-list" style="max-height:200px;overflow:auto">${lh.fileDetails.slice(0, 30).map(f => `<li class="mig-file-item"><span class="mig-file-path ts-xxs-r">${esc(f.path)}</span><span class="ts-xxs-m">${f.total} element${f.total > 1 ? 's' : ''}</span> ${Object.entries(f.byElement).map(([tag, n]) => `<span class="ts-xxs-r" style="color:var(--text-secondary)">&lt;${tag}&gt;: ${n}</span>`).join(' ')}</li>`).join('')}</ul>${lh.fileDetails.length > 30 ? `<p class="ts-xxs-r" style="color:var(--text-secondary);margin-top:var(--space-4)">… and ${lh.fileDetails.length - 30} more files</p>` : ''}</div>` : '';
     legacyHtmlBlock = `<div class="mig-card mig-legacy-card">
       <div class="mig-card-header" onclick="toggleMigFiles('__legacy-html__')">
         <div style="display:flex;align-items:center;flex:1">
@@ -835,7 +835,7 @@ function renderMigCard(c) {
   }
 
   const filesHtml = c.files.length > 0 ? `<div class="mig-files-section" style="border-top:1px solid var(--border-default);padding-top:var(--space-12)">
-    <div class="ts-xxs-m" style="color:var(--text-secondary);margin-bottom:var(--space-8)">📄 Fichiers concernés (${c.filesAffected})</div>
+    <div class="ts-xxs-m" style="color:var(--text-secondary);margin-bottom:var(--space-8)">📄 Affected files (${c.filesAffected})</div>
     <div class="mig-file-list">
       ${c.files.map(f => `<div class="mig-file-item">
         <span class="mig-file-path ts-xxs-r">${f.path}</span>

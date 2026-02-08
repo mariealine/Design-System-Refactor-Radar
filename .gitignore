@@ -1,6 +1,9 @@
 node_modules/
 dist/
 *.tgz
+design-system-refactor-radar-report.json
+design-system-refactor-radar-dashboard.html
+design-system-refactor-radar.config.mjs
 ds-coverage-report.json
 ds-coverage-dashboard.html
 ds-coverage.config.mjs

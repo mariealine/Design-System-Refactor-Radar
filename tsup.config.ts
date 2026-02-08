@@ -14,7 +14,7 @@ export default defineConfig([
   },
   {
     entry: {
-      cli: "bin/ds-coverage.ts",
+      cli: "bin/design-system-refactor-radar.ts",
     },
     format: ["cjs"],
     dts: false,

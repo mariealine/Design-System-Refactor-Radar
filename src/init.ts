@@ -57,6 +57,11 @@ export async function init(options: InitOptions = {}): Promise<GeneratedFile[]> 
   // Check if a config file already exists
   let configExists = false;
   const configFileNames = [
+    "design-system-refactor-radar.config.js",
+    "design-system-refactor-radar.config.mjs",
+    "design-system-refactor-radar.config.cjs",
+    "design-system-refactor-radar.config.json",
+    "design-system-refactor-radar.config.ts",
     "ds-coverage.config.js",
     "ds-coverage.config.mjs",
     "ds-coverage.config.cjs",
@@ -82,13 +87,13 @@ export async function init(options: InitOptions = {}): Promise<GeneratedFile[]> 
 
     // Write config file
     const configContent = serializeConfig(wizardConfig);
-    const configPath = join(projectRoot, "ds-coverage.config.mjs");
+    const configPath = join(projectRoot, "design-system-refactor-radar.config.mjs");
 
     if (!options.dryRun) {
       await writeFile(configPath, configContent, "utf-8");
-      log("\n  ✅ ds-coverage.config.mjs");
+      log("\n  ✅ design-system-refactor-radar.config.mjs");
     } else {
-      log("\n  📝 ds-coverage.config.mjs (dry run)");
+      log("\n  📝 design-system-refactor-radar.config.mjs (dry run)");
     }
 
     // Load full config (merge wizard output with defaults)
@@ -249,7 +254,7 @@ export async function init(options: InitOptions = {}): Promise<GeneratedFile[]> 
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       log(`  ⚠️  Scan failed: ${msg}`);
-      log("  Run `npx ds-coverage` to try again.");
+      log("  Run `npx design-system-refactor-radar` to try again.");
       log("");
     }
 
@@ -257,21 +262,21 @@ export async function init(options: InitOptions = {}): Promise<GeneratedFile[]> 
     log("  📌  Commands & dashboard");
     log(sep);
     log("");
-    log("  💡 Your Cursor assistant now follows your design system. Edit ds-coverage.config.js to adjust rules.");
+    log("  💡 Your Cursor assistant now follows your design system. Edit design-system-refactor-radar.config.js to adjust rules.");
     log("");
     log("  Run the script (scan codebase):");
-    log("    $ npx ds-coverage");
+    log("    $ npx design-system-refactor-radar");
     log("");
     log("  Open dashboard in browser:");
-    log("    $ npx ds-coverage --open");
+    log("    $ npx design-system-refactor-radar --open");
     if (dashboardPath) {
       log(`    → ${relative(projectRoot, dashboardPath)}`);
     } else {
-      log("    → ds-coverage-dashboard.html (after next scan)");
+      log("    → design-system-refactor-radar-dashboard.html (after next scan)");
     }
     log("");
     log("  Re-initialize the wizard (new config from scratch):");
-    log("    $ npx ds-coverage init --force");
+    log("    $ npx design-system-refactor-radar init --force");
     log("");
   } else if (!options.dryRun && created.length > 0) {
     // Init without wizard (e.g. --force): just show commands
@@ -280,9 +285,9 @@ export async function init(options: InitOptions = {}): Promise<GeneratedFile[]> 
     log("  📌  Commands & dashboard");
     log(sep);
     log("");
-    log("  Run the script: $ npx ds-coverage");
-    log("  Open dashboard: $ npx ds-coverage --open");
-    log("  Re-initialize:  $ npx ds-coverage init --force");
+log("  Run the script: $ npx design-system-refactor-radar");
+log("  Open dashboard: $ npx design-system-refactor-radar --open");
+log("  Re-initialize:  $ npx design-system-refactor-radar init --force");
     log("");
   }
 
@@ -294,6 +299,8 @@ export async function init(options: InitOptions = {}): Promise<GeneratedFile[]> 
 // ============================================
 
 const GITIGNORE_ENTRIES = [
+  "design-system-refactor-radar-report.json",
+  "design-system-refactor-radar-dashboard.html",
   "ds-coverage-report.json",
   "ds-coverage-dashboard.html",
 ];
@@ -318,7 +325,7 @@ async function updateGitignore(
 
   if (linesToAdd.length === 0) return;
 
-  const block = `\n# ds-coverage (generated output)\n${linesToAdd.join("\n")}\n`;
+  const block = `\n# Design System Refactor Radar (generated output)\n${linesToAdd.join("\n")}\n`;
   await writeFile(gitignorePath, existing.trimEnd() + "\n" + block, "utf-8");
   log(`  ✅ .gitignore (added: ${linesToAdd.join(", ")})`);
 }

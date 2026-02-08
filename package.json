@@ -1,7 +1,7 @@
 {
-  "name": "ds-coverage",
+  "name": "design-system-refactor-radar",
   "version": "0.1.0",
-  "description": "Design system coverage scanner & AI guidelines — enforce token usage, audit component APIs, and scaffold Cursor rules for any frontend project.",
+  "description": "Design System Refactor Radar — enforce token usage, audit component APIs, detect refactor risks, and scaffold Cursor rules for any frontend project.",
   "type": "module",
   "license": "MIT",
   "keywords": [
@@ -19,7 +19,7 @@
   "files": [
     "dist",
     "templates",
-    "ds-coverage.config.example.js",
+    "design-system-refactor-radar.config.example.js",
     "LICENSE",
     "README.md"
   ],
@@ -39,7 +39,8 @@
     }
   },
   "bin": {
-    "ds-coverage": "./dist/cli.cjs"
+    "design-system-refactor-radar": "./dist/cli.cjs",
+    "dsrr": "./dist/cli.cjs"
   },
   "scripts": {
     "build": "tsup",

@@ -71,7 +71,7 @@ export async function run(options: RunOptions = {}): Promise<RunResult> {
   const enabledViolations = Object.entries(config.violations).filter(([, v]) => v.enabled);
   if (enabledViolations.length === 0) {
     log("⚠️  No violation categories configured.");
-    log("   Run `npx ds-coverage init` to set up your project.\n");
+    log("   Run `npx design-system-refactor-radar init` to set up your project.\n");
   }
 
   log("🔍 Scanning design system coverage...\n");

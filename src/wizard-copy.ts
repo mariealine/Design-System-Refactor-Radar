@@ -158,7 +158,7 @@ export const COPY = {
     whichStepEdit: "  ✏️  Which step do you want to edit?",
     stepEditPrompt: (max: number) =>
       `  Step (1-${max}) or Enter to cancel → `,
-    cancelled: "\n  👋 Cancelled. Re-run `npx ds-coverage init` to start over.\n",
+    cancelled: "\n  👋 Cancelled. Re-run `npx design-system-refactor-radar init` to start over.\n",
   },
 } as const;
 

@@ -16,7 +16,7 @@ describe("Templates", () => {
   let tempDir;
 
   it("init generates compliance rule with correct structure", async () => {
-    tempDir = await mkdtemp(join(tmpdir(), "ds-coverage-test-"));
+    tempDir = await mkdtemp(join(tmpdir(), "design-system-refactor-radar-test-"));
 
     // Create a minimal config file
     const config = deepMerge(DEFAULT_CONFIG, {
@@ -37,7 +37,7 @@ describe("Templates", () => {
     });
 
     const configContent = `export default ${JSON.stringify(config, null, 2)};`;
-    await writeFile(join(tempDir, "ds-coverage.config.js"), configContent);
+    await writeFile(join(tempDir, "design-system-refactor-radar.config.js"), configContent);
     await mkdir(join(tempDir, "src"), { recursive: true });
 
     // Use dryRun to avoid filesystem writes (sandbox-safe)
@@ -77,13 +77,13 @@ describe("Templates", () => {
   });
 
   it("init skips component rule when componentAnalysis is disabled", async () => {
-    tempDir = await mkdtemp(join(tmpdir(), "ds-coverage-test-"));
+    tempDir = await mkdtemp(join(tmpdir(), "design-system-refactor-radar-test-"));
 
     const config = deepMerge(DEFAULT_CONFIG, {
       componentAnalysis: { enabled: false },
     });
     const configContent = `export default ${JSON.stringify(config, null, 2)};`;
-    await writeFile(join(tempDir, "ds-coverage.config.js"), configContent);
+    await writeFile(join(tempDir, "design-system-refactor-radar.config.js"), configContent);
     await mkdir(join(tempDir, "src"), { recursive: true });
 
     const results = await init({

@@ -1,14 +1,16 @@
 /**
- * DS Coverage CLI
+ * Design System Refactor Radar CLI
  *
  * Usage:
- *   npx ds-coverage              # Scan and generate dashboard
- *   npx ds-coverage init         # Interactive wizard + scaffold AI guidelines
- *   npx ds-coverage doctor       # Validate config and diagnose issues
- *   npx ds-coverage --dry-run    # Scan without writing files
- *   npx ds-coverage --silent     # No console output
- *   npx ds-coverage --open       # Open dashboard in browser after scan
- *   npx ds-coverage --help       # Show help
+ *   npx design-system-refactor-radar              # Scan and generate dashboard
+ *   npx design-system-refactor-radar init         # Interactive wizard + scaffold AI guidelines
+ *   npx design-system-refactor-radar doctor       # Validate config and diagnose issues
+ *   npx design-system-refactor-radar --dry-run    # Scan without writing files
+ *   npx design-system-refactor-radar --silent     # No console output
+ *   npx design-system-refactor-radar --open       # Open dashboard in browser after scan
+ *   npx design-system-refactor-radar --help       # Show help
+ *
+ * Shorthand: npx dsrr
  */
 
 import { run, init } from "../src/index.js";
@@ -18,16 +20,17 @@ const args = process.argv.slice(2);
 const command = args[0] && !args[0].startsWith("-") ? args[0] : "scan";
 
 if (args.includes("--version") || args.includes("-v")) {
-  console.log("ds-coverage 0.1.0");
+  console.log("design-system-refactor-radar 0.1.0");
   process.exit(0);
 }
 
 if (args.includes("--help") || args.includes("-h")) {
   console.log(`
-  ds-coverage — Design System Coverage Scanner & AI Guidelines
+  Design System Refactor Radar — Scanner & AI Guidelines
 
   Usage:
-    npx ds-coverage [command] [options]
+    npx design-system-refactor-radar [command] [options]
+    npx dsrr [command] [options]
 
   Commands:
     scan (default)   Scan codebase and generate dashboard
@@ -60,9 +63,9 @@ if (args.includes("--help") || args.includes("-h")) {
     -h, --help       Show this help message
 
   Configuration:
-    Run \`npx ds-coverage init\` to launch the interactive setup wizard.
+    Run \`npx design-system-refactor-radar init\` to launch the interactive setup wizard.
     It will guide you through configuration and generate:
-    - ds-coverage.config.mjs (your config file)
+    - design-system-refactor-radar.config.mjs (your config file)
     - .cursor/rules/ (AI rules for Cursor)
     - .cursor/skills/ (AI skills for Cursor)
 
@@ -137,15 +140,15 @@ async function main() {
     }
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    console.error(`\n❌ ds-coverage ${command} failed:\n`);
+    console.error(`\n❌ Design System Refactor Radar ${command} failed:\n`);
     console.error(`   ${message}\n`);
 
     // Helpful hints based on common errors
     if (message.includes("does not exist")) {
-      console.error("   💡 Check that your scanDir is correct in your ds-coverage config");
-      console.error("   💡 Or run `npx ds-coverage init` to create a config.\n");
+      console.error("   💡 Check that your scanDir is correct in your design-system-refactor-radar config");
+      console.error("   💡 Or run `npx design-system-refactor-radar init` to create a config.\n");
     } else if (message.includes("config")) {
-      console.error("   💡 Run `npx ds-coverage init` to create or fix your config.\n");
+      console.error("   💡 Run `npx design-system-refactor-radar init` to create or fix your config.\n");
     }
 
     process.exit(1);
