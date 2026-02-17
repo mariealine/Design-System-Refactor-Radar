@@ -25,7 +25,7 @@ export async function doctor(options: DoctorOptions = {}): Promise<void> {
   const projectRoot = options.projectRoot || process.cwd();
   const checks: Check[] = [];
 
-  console.log("\n🩺 Design System Refactor Radar doctor\n");
+  console.log("\n🩺 Design System Assistant doctor\n");
   console.log(`  Project root: ${projectRoot}\n`);
 
   // 1. Config loading
@@ -38,7 +38,7 @@ export async function doctor(options: DoctorOptions = {}): Promise<void> {
     const message = err instanceof Error ? err.message : String(err);
     checks.push({ label: "Config loaded", status: "fail", detail: message });
     printChecks(checks);
-    console.log("\n  ❌ Fix the config error above, then re-run `npx design-system-refactor-radar doctor`.\n");
+    console.log("\n  ❌ Fix the config error above, then re-run `npx design-system-assistant doctor`.\n");
     return;
   }
 
@@ -70,7 +70,7 @@ export async function doctor(options: DoctorOptions = {}): Promise<void> {
   // 4. Violation categories
   const enabledViolations = Object.entries(config.violations).filter(([, v]) => v.enabled);
   if (enabledViolations.length === 0) {
-    checks.push({ label: "Violation categories configured", status: "warn", detail: "No violation categories are enabled. Run `npx design-system-refactor-radar init` to set up patterns." });
+    checks.push({ label: "Violation categories configured", status: "warn", detail: "No violation categories are enabled. Run `npx design-system-assistant init` to set up patterns." });
   } else {
     checks.push({ label: "Violation categories configured", status: "pass", detail: `${enabledViolations.length} enabled: ${enabledViolations.map(([k]) => k).join(", ")}` });
   }
@@ -134,13 +134,13 @@ export async function doctor(options: DoctorOptions = {}): Promise<void> {
 
   console.log("");
   if (fails > 0) {
-    console.log(`  ❌ ${fails} issue(s) found. Fix them and re-run \`npx design-system-refactor-radar doctor\`.`);
+    console.log(`  ❌ ${fails} issue(s) found. Fix them and re-run \`npx design-system-assistant doctor\`.`);
   } else if (warns > 0) {
     console.log(`  ⚠️  ${passes} passed, ${warns} warning(s). Your setup works but could be improved.`);
   } else {
     console.log(`  ✅ All ${passes} checks passed. Your project is ready!`);
   }
-  console.log(`\n  Run \`npx design-system-refactor-radar\` to scan your codebase.\n`);
+  console.log(`\n  Run \`npx design-system-assistant\` to scan your codebase.\n`);
 }
 
 function printChecks(checks: Check[]): void {

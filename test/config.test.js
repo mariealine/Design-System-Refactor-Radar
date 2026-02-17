@@ -1,7 +1,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { join } from "node:path";
-import { deepMerge, DEFAULT_CONFIG, loadConfig } from "../dist/config.js";
+import { deepMerge, DEFAULT_CONFIG, loadConfig } from "design-system-assistant/config";
 
 describe("Config", () => {
   it("DEFAULT_CONFIG has minimal agnostic defaults", () => {

@@ -57,6 +57,11 @@ export async function init(options: InitOptions = {}): Promise<GeneratedFile[]> 
   // Check if a config file already exists
   let configExists = false;
   const configFileNames = [
+    "design-system-assistant.config.js",
+    "design-system-assistant.config.mjs",
+    "design-system-assistant.config.cjs",
+    "design-system-assistant.config.json",
+    "design-system-assistant.config.ts",
     "design-system-refactor-radar.config.js",
     "design-system-refactor-radar.config.mjs",
     "design-system-refactor-radar.config.cjs",
@@ -87,13 +92,13 @@ export async function init(options: InitOptions = {}): Promise<GeneratedFile[]> 
 
     // Write config file
     const configContent = serializeConfig(wizardConfig);
-    const configPath = join(projectRoot, "design-system-refactor-radar.config.mjs");
+    const configPath = join(projectRoot, "design-system-assistant.config.mjs");
 
     if (!options.dryRun) {
       await writeFile(configPath, configContent, "utf-8");
-      log("\n  ✅ design-system-refactor-radar.config.mjs");
+      log("\n  ✅ design-system-assistant.config.mjs");
     } else {
-      log("\n  📝 design-system-refactor-radar.config.mjs (dry run)");
+      log("\n  📝 design-system-assistant.config.mjs (dry run)");
     }
 
     // Load full config (merge wizard output with defaults)
@@ -254,7 +259,7 @@ export async function init(options: InitOptions = {}): Promise<GeneratedFile[]> 
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       log(`  ⚠️  Scan failed: ${msg}`);
-      log("  Run `npx design-system-refactor-radar` to try again.");
+      log("  Run `npx design-system-assistant` to try again.");
       log("");
     }
 
@@ -262,21 +267,21 @@ export async function init(options: InitOptions = {}): Promise<GeneratedFile[]> 
     log("  📌  Commands & dashboard");
     log(sep);
     log("");
-    log("  💡 Your Cursor assistant now follows your design system. Edit design-system-refactor-radar.config.js to adjust rules.");
+    log("  💡 Your Cursor assistant now follows your design system. Edit design-system-assistant.config.js to adjust rules.");
     log("");
     log("  Run the script (scan codebase):");
-    log("    $ npx design-system-refactor-radar");
+    log("    $ npx design-system-assistant");
     log("");
     log("  Open dashboard in browser:");
-    log("    $ npx design-system-refactor-radar --open");
+    log("    $ npx design-system-assistant --open");
     if (dashboardPath) {
       log(`    → ${relative(projectRoot, dashboardPath)}`);
     } else {
-      log("    → design-system-refactor-radar-dashboard.html (after next scan)");
+      log("    → design-system-assistant-dashboard.html (after next scan)");
     }
     log("");
     log("  Re-initialize the wizard (new config from scratch):");
-    log("    $ npx design-system-refactor-radar init --force");
+    log("    $ npx design-system-assistant init --force");
     log("");
   } else if (!options.dryRun && created.length > 0) {
     // Init without wizard (e.g. --force): just show commands
@@ -285,9 +290,9 @@ export async function init(options: InitOptions = {}): Promise<GeneratedFile[]> 
     log("  📌  Commands & dashboard");
     log(sep);
     log("");
-log("  Run the script: $ npx design-system-refactor-radar");
-log("  Open dashboard: $ npx design-system-refactor-radar --open");
-log("  Re-initialize:  $ npx design-system-refactor-radar init --force");
+log("  Run the script: $ npx design-system-assistant");
+log("  Open dashboard: $ npx design-system-assistant --open");
+log("  Re-initialize:  $ npx design-system-assistant init --force");
     log("");
   }
 
@@ -299,8 +304,8 @@ log("  Re-initialize:  $ npx design-system-refactor-radar init --force");
 // ============================================
 
 const GITIGNORE_ENTRIES = [
-  "design-system-refactor-radar-report.json",
-  "design-system-refactor-radar-dashboard.html",
+  "design-system-assistant-report.json",
+  "design-system-assistant-dashboard.html",
   "ds-coverage-report.json",
   "ds-coverage-dashboard.html",
 ];
@@ -325,7 +330,7 @@ async function updateGitignore(
 
   if (linesToAdd.length === 0) return;
 
-  const block = `\n# Design System Refactor Radar (generated output)\n${linesToAdd.join("\n")}\n`;
+  const block = `\n# Design System Assistant (generated output)\n${linesToAdd.join("\n")}\n`;
   await writeFile(gitignorePath, existing.trimEnd() + "\n" + block, "utf-8");
   log(`  ✅ .gitignore (added: ${linesToAdd.join(", ")})`);
 }

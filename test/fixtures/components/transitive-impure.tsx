@@ -1,6 +1,6 @@
 // Component that imports a helper, which imports business logic
 import React from "react";
-import { formatDate } from "./helper.js";
+import { formatDate } from "./helper";
 
 export function TransitiveImpure() {
   return <div>{formatDate(new Date())}</div>;

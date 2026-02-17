@@ -7,13 +7,15 @@
  */
 
 import { readFile } from "node:fs/promises";
-import { resolve } from "node:path";
+import { resolve, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import type { DsCoverageConfig } from "./config.js";
 import type { Report } from "./types.js";
 
-// ...
-
-const _currentDir = __dirname;
+const _currentDir =
+  typeof __dirname !== "undefined"
+    ? __dirname
+    : dirname(fileURLToPath(import.meta.url));
 
 export async function buildDashboard(
   report: Report,

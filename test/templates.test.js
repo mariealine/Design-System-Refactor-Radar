@@ -1,13 +1,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { deepMerge, DEFAULT_CONFIG } from "../dist/config.js";
-
-// Import template generators from the built bundle
-// They're not directly exported, so we need to use the init pathway
-// Instead, let's test via dynamic import of the chunks
-// Actually, the templates are used internally — let's test via the init dry-run
-
-import { init } from "../dist/index.js";
+import { deepMerge, DEFAULT_CONFIG } from "design-system-assistant/config";
+import { init } from "design-system-assistant";
 import { join } from "node:path";
 import { mkdtemp, rm, writeFile, mkdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -16,7 +10,7 @@ describe("Templates", () => {
   let tempDir;
 
   it("init generates compliance rule with correct structure", async () => {
-    tempDir = await mkdtemp(join(tmpdir(), "design-system-refactor-radar-test-"));
+    tempDir = await mkdtemp(join(tmpdir(), "design-system-assistant-test-"));
 
     // Create a minimal config file
     const config = deepMerge(DEFAULT_CONFIG, {
@@ -37,7 +31,7 @@ describe("Templates", () => {
     });
 
     const configContent = `export default ${JSON.stringify(config, null, 2)};`;
-    await writeFile(join(tempDir, "design-system-refactor-radar.config.js"), configContent);
+    await writeFile(join(tempDir, "design-system-assistant.config.js"), configContent);
     await mkdir(join(tempDir, "src"), { recursive: true });
 
     // Use dryRun to avoid filesystem writes (sandbox-safe)
@@ -77,13 +71,13 @@ describe("Templates", () => {
   });
 
   it("init skips component rule when componentAnalysis is disabled", async () => {
-    tempDir = await mkdtemp(join(tmpdir(), "design-system-refactor-radar-test-"));
+    tempDir = await mkdtemp(join(tmpdir(), "design-system-assistant-test-"));
 
     const config = deepMerge(DEFAULT_CONFIG, {
       componentAnalysis: { enabled: false },
     });
     const configContent = `export default ${JSON.stringify(config, null, 2)};`;
-    await writeFile(join(tempDir, "design-system-refactor-radar.config.js"), configContent);
+    await writeFile(join(tempDir, "design-system-assistant.config.js"), configContent);
     await mkdir(join(tempDir, "src"), { recursive: true });
 
     const results = await init({

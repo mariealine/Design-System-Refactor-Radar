@@ -11,10 +11,12 @@ export default defineConfig([
     clean: true,
     sourcemap: true,
     target: "node20",
+    // Don't bundle TypeScript so ESM build doesn't hit "Dynamic require of 'fs'"
+    external: ["typescript"],
   },
   {
     entry: {
-      cli: "bin/design-system-refactor-radar.ts",
+      cli: "bin/design-system-assistant.ts",
     },
     format: ["cjs"],
     dts: false,

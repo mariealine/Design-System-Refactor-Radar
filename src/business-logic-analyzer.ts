@@ -9,6 +9,8 @@ import { relative } from "node:path";
 import type { DsCoverageConfig, BusinessLogicAnalysisConfig } from "./config.js";
 import type { BusinessLogicReport, FileReport } from "./types.js";
 
+type NativeHtmlCounts = BusinessLogicReport["nativeHtmlElements"];
+
 // ============================================
 // NATIVE HTML ELEMENT DETECTION
 // ============================================
@@ -16,7 +18,7 @@ import type { BusinessLogicReport, FileReport } from "./types.js";
 function detectNativeHtmlElements(
   content: string,
   elements: string[],
-): Record<string, number> {
+): NativeHtmlCounts {
   const counts: Record<string, number> = {};
   for (const element of elements) {
     // Match JSX/TSX: <element, <element>, </element>, <element/>, <element />
@@ -25,8 +27,8 @@ function detectNativeHtmlElements(
     const matches = content.match(pattern);
     counts[element] = matches ? matches.length : 0;
   }
-  counts.total = Object.values(counts).reduce((sum, count) => sum + count, 0);
-  return counts;
+  const total = Object.values(counts).reduce((sum, count) => sum + count, 0);
+  return { ...counts, total } as NativeHtmlCounts;
 }
 
 // ============================================

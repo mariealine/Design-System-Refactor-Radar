@@ -1,7 +1,7 @@
 {
-  "name": "design-system-refactor-radar",
+  "name": "design-system-assistant",
   "version": "0.1.0",
-  "description": "Design System Refactor Radar — enforce token usage, audit component APIs, detect refactor risks, and scaffold Cursor rules for any frontend project.",
+  "description": "Design System Assistant — enforce token usage, audit component APIs, detect refactor risks, and scaffold Cursor rules for any frontend project.",
   "type": "module",
   "license": "MIT",
   "keywords": [
@@ -19,9 +19,12 @@
   "files": [
     "dist",
     "templates",
-    "design-system-refactor-radar.config.example.js",
+    "design-system-assistant.config.example.js",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "CHANGELOG.md",
+    "CONTRIBUTING.md",
+    "SECURITY.md"
   ],
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -39,8 +42,8 @@
     }
   },
   "bin": {
-    "design-system-refactor-radar": "./dist/cli.cjs",
-    "dsrr": "./dist/cli.cjs"
+    "design-system-assistant": "./dist/cli.cjs",
+    "dsa": "./dist/cli.cjs"
   },
   "scripts": {
     "build": "tsup",
@@ -57,5 +60,13 @@
   "engines": {
     "node": ">=20.0.0"
   },
-  "author": "Marie-Aline Millot"
+  "author": "Marie-Aline Millot",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mariealine/Design-System-Assistant.git"
+  },
+  "homepage": "https://github.com/mariealine/Design-System-Assistant#readme",
+  "bugs": {
+    "url": "https://github.com/mariealine/Design-System-Assistant/issues"
+  }
 }

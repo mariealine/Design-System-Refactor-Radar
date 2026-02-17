@@ -430,23 +430,9 @@ export async function analyzeImportBoundaries(
   const tsConfig = loadTsConfig(projectRoot);
   const reports: Record<string, ImportBoundaryReport> = {};
 
-  // Get scan directories for relative path calculation
-  const scanDirs = config.scanDirs || [config.scanDir];
-
   for (const [filePath, content] of fileContents) {
-    // Determine relative path from appropriate scan directory
-    let relativePath = "";
-    for (const scanDir of scanDirs) {
-      const scanDirAbsolute = join(projectRoot, scanDir);
-      if (filePath.startsWith(scanDirAbsolute)) {
-        relativePath = relative(scanDirAbsolute, filePath);
-        break;
-      }
-    }
-    // Fallback if not found in any scan dir
-    if (!relativePath) {
-      relativePath = relative(projectRoot, filePath);
-    }
+    // Relative path from project root (used as report key and for uiCandidate check)
+    const relativePath = relative(projectRoot, filePath);
 
     const report = analyzeFile(
       filePath,

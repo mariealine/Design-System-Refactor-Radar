@@ -222,7 +222,7 @@ export async function scan(
       if (err instanceof Error && "code" in err && (err as NodeJS.ErrnoException).code === "ENOENT") {
         const relativeDir = relative(projectRoot, scanDir);
         throw new Error(
-          `scanDir "${relativeDir}" does not exist. Check your design-system-refactor-radar.config or run \`npx design-system-refactor-radar init\`.`,
+          `scanDir "${relativeDir}" does not exist. Check your design-system-assistant.config or run \`npx design-system-assistant init\`.`,
         );
       }
       throw err;

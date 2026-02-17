@@ -2,11 +2,8 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { deepMerge, DEFAULT_CONFIG } from "../dist/config.js";
-
-// We need to import the migration analyzer from the built output
-// Since it's not directly exported, we'll test it via the full pipeline
-import { run } from "../dist/index.js";
+import { deepMerge, DEFAULT_CONFIG } from "design-system-assistant/config";
+import { run } from "design-system-assistant";
 
 const FIXTURES = join(import.meta.dirname, "fixtures");
 

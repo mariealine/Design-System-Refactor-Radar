@@ -1,16 +1,16 @@
 /**
- * Design System Refactor Radar CLI
+ * Design System Assistant CLI
  *
  * Usage:
- *   npx design-system-refactor-radar              # Scan and generate dashboard
- *   npx design-system-refactor-radar init         # Interactive wizard + scaffold AI guidelines
- *   npx design-system-refactor-radar doctor       # Validate config and diagnose issues
- *   npx design-system-refactor-radar --dry-run    # Scan without writing files
- *   npx design-system-refactor-radar --silent     # No console output
- *   npx design-system-refactor-radar --open       # Open dashboard in browser after scan
- *   npx design-system-refactor-radar --help       # Show help
+ *   npx design-system-assistant              # Scan and generate dashboard
+ *   npx design-system-assistant init         # Interactive wizard + scaffold AI guidelines
+ *   npx design-system-assistant doctor       # Validate config and diagnose issues
+ *   npx design-system-assistant --dry-run    # Scan without writing files
+ *   npx design-system-assistant --silent     # No console output
+ *   npx design-system-assistant --open       # Open dashboard in browser after scan
+ *   npx design-system-assistant --help       # Show help
  *
- * Shorthand: npx dsrr
+ * Shorthand: npx dsa
  */
 
 import { run, init } from "../src/index.js";
@@ -20,17 +20,17 @@ const args = process.argv.slice(2);
 const command = args[0] && !args[0].startsWith("-") ? args[0] : "scan";
 
 if (args.includes("--version") || args.includes("-v")) {
-  console.log("design-system-refactor-radar 0.1.0");
+  console.log("design-system-assistant 0.1.0");
   process.exit(0);
 }
 
 if (args.includes("--help") || args.includes("-h")) {
   console.log(`
-  Design System Refactor Radar — Scanner & AI Guidelines
+  Design System Assistant — Scanner & AI Guidelines
 
   Usage:
-    npx design-system-refactor-radar [command] [options]
-    npx dsrr [command] [options]
+    npx design-system-assistant [command] [options]
+    npx dsa [command] [options]
 
   Commands:
     scan (default)   Scan codebase and generate dashboard
@@ -63,9 +63,9 @@ if (args.includes("--help") || args.includes("-h")) {
     -h, --help       Show this help message
 
   Configuration:
-    Run \`npx design-system-refactor-radar init\` to launch the interactive setup wizard.
+    Run \`npx design-system-assistant init\` to launch the interactive setup wizard.
     It will guide you through configuration and generate:
-    - design-system-refactor-radar.config.mjs (your config file)
+    - design-system-assistant.config.mjs (your config file)
     - .cursor/rules/ (AI rules for Cursor)
     - .cursor/skills/ (AI skills for Cursor)
 
@@ -140,15 +140,15 @@ async function main() {
     }
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    console.error(`\n❌ Design System Refactor Radar ${command} failed:\n`);
+    console.error(`\n❌ Design System Assistant ${command} failed:\n`);
     console.error(`   ${message}\n`);
 
     // Helpful hints based on common errors
     if (message.includes("does not exist")) {
-      console.error("   💡 Check that your scanDir is correct in your design-system-refactor-radar config");
-      console.error("   💡 Or run `npx design-system-refactor-radar init` to create a config.\n");
+      console.error("   💡 Check that your scanDir is correct in your design-system-assistant config");
+      console.error("   💡 Or run `npx design-system-assistant init` to create a config.\n");
     } else if (message.includes("config")) {
-      console.error("   💡 Run `npx design-system-refactor-radar init` to create or fix your config.\n");
+      console.error("   💡 Run `npx design-system-assistant init` to create or fix your config.\n");
     }
 
     process.exit(1);

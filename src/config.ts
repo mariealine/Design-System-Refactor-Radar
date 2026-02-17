@@ -3,7 +3,7 @@
  *
  * Defines the config schema and provides minimal, agnostic defaults.
  * Stack-specific patterns are provided by presets (see presets.ts)
- * and applied via the interactive wizard (`npx design-system-refactor-radar init`).
+ * and applied via the interactive wizard (`npx design-system-assistant init`).
  */
 
 import { readFileSync, existsSync } from "node:fs";
@@ -304,8 +304,8 @@ export const DEFAULT_CONFIG: DsCoverageConfig = {
   },
 
   output: {
-    reportJson: "design-system-refactor-radar-report.json",
-    dashboardHtml: "design-system-refactor-radar-dashboard.html",
+    reportJson: "design-system-assistant-report.json",
+    dashboardHtml: "design-system-assistant-dashboard.html",
   },
 };
 
@@ -314,6 +314,11 @@ export const DEFAULT_CONFIG: DsCoverageConfig = {
 // ============================================
 
 const CONFIG_FILE_NAMES = [
+  "design-system-assistant.config.js",
+  "design-system-assistant.config.mjs",
+  "design-system-assistant.config.cjs",
+  "design-system-assistant.config.json",
+  "design-system-assistant.config.ts",
   "design-system-refactor-radar.config.js",
   "design-system-refactor-radar.config.mjs",
   "design-system-refactor-radar.config.cjs",
@@ -382,7 +387,7 @@ export async function loadConfig(
       const message = err instanceof Error ? err.message : String(err);
       throw new Error(
         `Failed to load config file "${fileName}":\n  ${message}\n\n` +
-        `Fix the error in ${fileName}, or delete it and re-run \`npx design-system-refactor-radar init\`.`,
+        `Fix the error in ${fileName}, or delete it and re-run \`npx design-system-assistant init\`.`,
       );
     }
   }
@@ -418,7 +423,7 @@ function validateConfig(config: DsCoverageConfig): DsCoverageConfig {
   // Warn about unknown top-level keys
   for (const key of Object.keys(config)) {
     if (!KNOWN_TOP_KEYS.has(key)) {
-      console.warn(`⚠️  Design System Refactor Radar config: unknown key "${key}" — will be ignored. Check for typos.`);
+      console.warn(`⚠️  Design System Assistant config: unknown key "${key}" — will be ignored. Check for typos.`);
     }
   }
 
@@ -429,7 +434,7 @@ function validateConfig(config: DsCoverageConfig): DsCoverageConfig {
       new RegExp(catConfig.pattern, "g");
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
-      console.warn(`⚠️  Design System Refactor Radar config: invalid regex in violations.${key}.pattern: ${message}`);
+      console.warn(`⚠️  Design System Assistant config: invalid regex in violations.${key}.pattern: ${message}`);
     }
   }
 

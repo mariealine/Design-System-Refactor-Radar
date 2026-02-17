@@ -1,7 +1,6 @@
-// Helper file that imports business logic
-import { db } from "@/db/client";
+// Helper that imports business logic — used by transitive-impure.tsx to trigger transitive violation
+import { format } from "@/lib/date-utils";
 
-export function formatDate(date: Date): string {
-  // This helper imports business logic, making transitive-impure.tsx impure
-  return date.toISOString();
+export function formatDate(d: Date): string {
+  return format(d, "yyyy-MM-dd");
 }

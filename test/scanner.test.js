@@ -1,8 +1,8 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { join } from "node:path";
-import { scan, buildCategorySummary } from "../dist/index.js";
-import { deepMerge, DEFAULT_CONFIG } from "../dist/config.js";
+import { scan, buildCategorySummary } from "design-system-assistant";
+import { deepMerge, DEFAULT_CONFIG } from "design-system-assistant/config";
 
 const FIXTURES = join(import.meta.dirname, "fixtures");
 
