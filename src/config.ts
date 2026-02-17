@@ -299,7 +299,7 @@ export const DEFAULT_CONFIG: DsCoverageConfig = {
   },
 
   dashboard: {
-    title: "Design System Coverage",
+    title: "Design System Assistant",
     subtitle: "",
   },
 

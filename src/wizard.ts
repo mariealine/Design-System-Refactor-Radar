@@ -523,7 +523,7 @@ export function buildConfigFromAnswers(answers: WizardAnswers): Partial<DsCovera
     componentAnalysis,
     migration,
     dashboard: {
-      title: "Design System Coverage",
+      title: "Design System Assistant",
       subtitle: answers.dsStatus === "from-scratch"
         ? "Building a design system from scratch"
         : "",
